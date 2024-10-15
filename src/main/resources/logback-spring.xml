@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- MyBatis SQL 로그를 DEBUG 레벨로 출력 -->
+    <logger name="org.apache.ibatis" level="DEBUG" additivity="false">
+        <appender-ref ref="console" />
+    </logger>
+    <logger name="java.sql" level="info" additivity="false">
+        <appender-ref ref="console" />
+    </logger>
+    <logger name="jdbc" level="info" additivity="false">
+        <appender-ref ref="console" />
+    </logger>
+
+    <!-- HikariCP 로그를 INFO로 설정 -->
+    <logger name="com.zaxxer.hikari" level="INFO" additivity="false">
+        <appender-ref ref="console" />
+    </logger>
+
+    <!-- Spring Session 로그만 INFO 레벨로 설정해서 session 관련 로그 제거 -->
+    <logger name="org.springframework.session" level="INFO" additivity="false">
+        <appender-ref ref="console" />
+    </logger>
+
+    <!-- Spring 관련 로깅 설정 (INFO 레벨) -->
+    <logger name="org.springframework" level="debug" additivity="false">
+        <appender-ref ref="console" />
+    </logger>
+
+    <!-- Root 로거 설정 -->
+    <root level="debug">
+        <appender-ref ref="console" />
+    </root>
+</configuration>

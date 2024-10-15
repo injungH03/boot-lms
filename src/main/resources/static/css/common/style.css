@@ -1,0 +1,212 @@
+@charset "UTF-8";
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: Arial, sans-serif;
+	font-size:13px;
+	
+}
+
+body {
+	display: grid;
+	grid-template-columns: 13% 1fr;
+/* 	grid-template-rows: 10% 1fr; */
+	grid-template-areas: "header header" "sidebar content";
+/* 	height: 100vh; */
+	
+}
+
+.dashboard-header {
+	grid-area: header;
+	background-color: #ecf0f1;
+	color: #ecf0f1;
+}
+
+.dashboard-sidebar {
+	grid-area: sidebar;
+	background-color: #ecf0f1;
+	color: #ffffff;
+	display: flex;
+	flex-direction: column;
+	border-right: 1px solid #ddd;
+    min-height: calc(100vh - 50px);
+}
+
+
+.header {
+	grid-area: header;
+	background-color:#888c88;
+	color: white;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 20px;
+}
+
+.header .logo {
+	font-size: 18px;
+	font-weight: bold;
+	color: white;
+	margin-right: 20px;
+}
+
+.header .header-links {
+	display: flex;
+	flex-grow: 1;
+}
+
+.header .header-links a {
+	color: white;
+	padding: 15px 20px;
+	text-decoration: none;
+	font-weight: bold;
+	font-size: 15px;
+}
+
+.header .header-links a.active, .header .header-links a:hover {
+	background-color: #525550;
+	color: white;
+}
+
+.header .header-right {
+	display: flex;
+	align-items: center;
+}
+
+.header .welcome-msg {
+	margin-right: 15px;
+	font-size: 13px;
+	white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+}
+
+.header .logout-btn, .header .customer-center-btn, .header .site-btn {
+	background-color:#525550;
+	color: white;
+	padding: 5px 10px;
+	text-decoration: none;
+	border-radius: 3px;
+	margin-left: 10px;
+}
+
+.header .customer-center-btn {
+	background-color:#525550;
+}
+
+.header .site-btn {
+	background-color: #337ab7; /* 사이트 버튼 색상 */
+}
+
+.sidebar {
+	/*     grid-area: sidebar; */
+	background-color: #ffffff; /* 배경을 흰색으로 설정 */
+	padding: 10px 0; /* 패딩을 줄여서 더 컴팩트하게 */
+}
+
+.sidebar .menu-group {
+	margin-bottom: 10px; /* 각 메뉴 그룹 사이에 여백 추가 */
+}
+
+.sidebar .menu-group:last-child {
+	border-bottom: none; /* 마지막 메뉴 그룹에는 구분선 제거 */
+}
+
+.sidebar .menu-group h3 {
+	margin: 0;
+	padding: 12px 18px; /* 텍스트와의 간격을 조절 */
+	font-size: 15px; /* 헤더의 폰트 크기 한 단계 증가 */
+	font-weight: bold;
+	color: #333;
+	background-color: #f5f5f5; /* 헤더의 배경색을 밝은 회색으로 설정 */
+	border-left: 5px solid #292b2d; /* 헤더 왼쪽에 강조선 추가 */
+	cursor: pointer; /* 클릭 가능하다는 느낌을 주기 위해 커서 변경 */
+}
+
+.sidebar .menu-group ul {
+	list-style-type: none;
+	padding-left: 10px; /* 하위 메뉴와 헤더의 간격을 좁힘 */
+	margin: 0;
+}
+
+.sidebar .menu-group ul li {
+	padding: 6px 0;
+}
+
+.sidebar .menu-group ul li a {
+	display: flex;
+	align-items: center;
+	padding: 6px 15px; /* 각 하위 메뉴 항목에 패딩 추가 */
+	color: #555;
+	text-decoration: none;
+	font-size: 13px; /* 하위 메뉴의 폰트 크기 한 단계 증가 */
+}
+
+.sidebar .menu-group ul li a:hover {
+	background-color: #f0f0f0; /* 하위 메뉴 항목 호버 시 배경색 변경 */
+	color: #333;
+}
+.sidebar .menu-group ul li a.active {
+	background-color: #f0f0f0;
+	color: #333;
+}
+
+.sidebar .menu-group ul li a::before {
+	content: "\25B6"; /* 삼각형 아이콘 추가 (>) */
+	margin-right: 10px;
+	font-size: 12px; /* 아이콘 크기 조정 */
+	color: #555; /* 아이콘 색상 */
+}
+
+
+
+/* 파일 리스트 스타일 */
+.file-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* 파일 추가 시 각 파일의 스타일 */
+.file_add {
+    display: flex;
+    align-items: center; 
+    justify-content: space-between;
+    background-color: #f4f4f9;
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%; 
+    max-width: 500px; 
+    white-space: nowrap; 
+}
+
+/* 파일 이름과 삭제 버튼을 나란히 배치 */
+.file_add span {
+	flex: 1;
+    font-size: 14px;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 10px;
+}
+
+/* 삭제 버튼 스타일 */
+.file_add input[type="button"] {
+    background-color: #ff5a5f;
+    border: none;
+    color: white;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.file_add input[type="button"]:hover {
+    background-color: #ff3034;
+}
+
+

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atos.lms.business.exam.service.TestBoardDAO">
+
+
+	<sql id="whereClause">
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="searchCnd == 0">
+					AND TITLE LIKE CONCAT ('%', #{searchWrd},'%') 		
+			</if>
+			<if test="searchCnd == 1">
+					AND CONTENT LIKE CONCAT ('%', #{searchWrd},'%') 		
+			</if>	
+			<if test="searchCnd == 2">
+					AND WRITER LIKE CONCAT ('%', #{searchWrd},'%') 		
+			</if>
+		</trim>
+	</sql>
+
+
+	<select id="selectBoardList" resultType="com.atos.lms.business.exam.model.TestBoardVO">
+		SELECT
+			BOARD_NUM, WRITER, TITLE, CONTENT, REG_DATE, ATCH_FILE_ID
+		FROM
+			TEST_BOARD
+		<include refid="whereClause" />				
+		ORDER BY BOARD_NUM
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>	
+	
+	<select id="selectBoardListCnt" resultType="java.lang.Integer">
+		SELECT
+			COUNT(BOARD_NUM)
+		FROM
+			TEST_BOARD
+		<include refid="whereClause" />
+	</select>
+	
+	<select id="selectBoardKey" resultType="com.atos.lms.business.exam.model.TestBoardVO">
+		SELECT
+			BOARD_NUM, WRITER, TITLE, CONTENT, REG_DATE, ATCH_FILE_ID
+		FROM
+			TEST_BOARD
+		WHERE
+			BOARD_NUM = #{boardNum}
+	</select>	
+ 
+ 	<insert id="insertBoard" >
+ 		INSERT INTO TEST_BOARD
+ 			(WRITER, TITLE, CONTENT, ATCH_FILE_ID)
+ 		VALUES
+ 			(#{writer}, #{title}, #{content}, #{atchFileId})
+ 	</insert>
+	
+	<update id="updateBoard">
+		UPDATE TEST_BOARD SET
+			WRITER = #{writer},
+			TITLE = #{title},
+			CONTENT = #{content}
+		WHERE
+			BOARD_NUM = #{boardNum}	
+	</update>
+	
+</mapper>

@@ -1,0 +1,212 @@
+@charset "UTF-8";
+
+
+.board {
+	background-color: #ffffff;
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	margin-bottom: 20px;
+}
+
+.board h1 {
+	font-size: 1.8em;
+	color: #34495e;
+	margin-bottom: 20px;
+	border-bottom: 2px solid #ecf0f1;
+	padding-bottom: 10px;
+}
+
+.search_box {
+	margin-bottom: 20px;
+}
+
+.search_box ul {
+	padding: 0;
+	list-style-type: none;
+	display: flex;
+	gap: 10px;
+}
+
+.search_box ul li {
+	display: flex;
+	align-items: center;
+}
+
+.search_box select, .search_box .s_input {
+	padding: 10px;
+	border: 1px solid #bdc3c7;
+	border-radius: 4px;
+	font-size: 1em;
+}
+
+.search_box .s_btn, .search_box .btn_b a {
+	margin-right: 10px;
+	background-color: #1abc9c;
+	color: #ffffff;
+	border: none;
+	padding: 10px 20px; 
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 1em;
+	transition: background-color 0.3s ease;
+	display: inline-block;
+	text-align: center;
+	line-height: 1.4;
+}
+
+.search_box .btn_b a {
+	background-color: #3498db;
+}
+
+.search_box .s_btn:hover, .search_box .btn_b a:hover {
+	background-color: #16a085;
+}
+
+.search_box .btn_b a:hover {
+	background-color: #2980b9;
+}
+
+.board_list {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 20px;
+}
+
+.board_list caption {
+	text-align: left;
+	font-weight: bold;
+	margin-bottom: 10px;
+	color: #34495e;
+}
+
+.board_list th, .board_list td {
+	padding: 10px;
+	text-align: left;
+	border-bottom: 1px solid #ecf0f1;
+}
+
+.board_list th {
+	background-color: #34495e;
+	color: #ecf0f1;
+}
+
+.board_list tr:hover td {
+	background-color: #f2f2f2;
+}
+
+.board_list .board_th_link a {
+	color: #3498db;
+	text-decoration: none;
+	transition: color 0.3s ease;
+}
+
+.board_list .board_th_link a:hover {
+	color: #2980b9;
+}
+
+.s_input {
+	margin-right: 10px;
+}
+
+.board h2 {
+	font-size: 1.8em;
+	color: #34495e;
+	margin-bottom: 20px;
+	border-bottom: 2px solid #ecf0f1;
+	padding-bottom: 10px;
+}
+
+테이블 스타일링
+.wTable {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 20px;
+}
+
+.wTable caption {
+	text-align: left;
+	font-weight: bold;
+	margin-bottom: 10px;
+	color: #34495e;
+}
+
+.wTable th, .wTable td {
+	padding: 10px;
+	text-align: left;
+	border-bottom: 1px solid #ecf0f1;
+}
+
+.wTable th {
+	background-color: #34495e;
+	color: #ecf0f1;
+	width: 20%;
+}
+
+.wTable td {
+	background-color: #ffffff;
+}
+
+.wTable input[type="text"], .wTable textarea {
+	width: 100%;
+	padding: 10px;
+	border: 1px solid #bdc3c7;
+	border-radius: 4px;
+	font-size: 1em;
+	box-sizing: border-box;
+}
+
+.wTable textarea {
+	resize: vertical;
+	height: 200px;
+}
+
+버튼 스타일링
+.btn {
+	margin-top: 20px;
+	text-align: right;
+}
+
+.btn .s_submit {
+	background-color: #1abc9c;
+	color: #ffffff;
+	border: none;
+	padding: 10px 20px;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 1em;
+	transition: background-color 0.3s ease;
+	display: inline-block;
+	text-align: center;
+	line-height: 1.4;
+	margin-right: 10px;
+}
+
+.btn .s_submit:hover {
+	background-color: #16a085;
+}
+
+.btn .btn_s a {
+	background-color: #3498db;
+	color: #ffffff;
+	padding: 10px 20px;
+	border-radius: 4px;
+	text-decoration: none;
+	transition: background-color 0.3s ease;
+	margin-left: 10px;
+}
+
+.btn .btn_s a:hover {
+	background-color: #2980b9;
+}
+
+추가적인 작은 스타일 조정
+.nopd textarea {
+	width: calc(100% - 20px);
+	margin: 10px;
+}
+
+.pilsu {
+	color: red;
+	font-weight: bold;
+}

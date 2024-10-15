@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atos.lms.business.member.service.LoginDAO">
+
+	<select id="existMember" resultType="boolean">
+		SELECT COUNT(*) > 0
+		FROM ATOS_MEMBER
+		WHERE ID = #{id}
+	</select>
+
+	<select id="findMember" resultType="com.atos.lms.business.member.model.MemberVO">
+		SELECT
+			M.ID, M.NAME, M.PASSWORD, M.ROLE_ID, R.ROLE_NAME, M.ENABLED
+		FROM ATOS_MEMBER M
+		INNER JOIN ATOS_ROLE R
+			ON M.ROLE_ID = R.ROLE_CODE
+		WHERE M.ID = #{username}
+	</select>
+
+	<insert id="insertMember">
+		INSERT INTO ATOS_MEMBER
+			(ID, PASSWORD, NAME, EMAIL, ROLE_ID)
+		VALUES
+		    (#{id}, #{password}, #{name}, #{email}, #{roleId})
+	</insert>
+
+	
+</mapper>

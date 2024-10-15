@@ -1,0 +1,40 @@
+package com.atos.lms.business.member.service;
+
+import com.atos.lms.business.member.model.MemberVO;
+import com.atos.lms.common.model.ResponseVO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+@Service
+public class MemberService {
+
+    private final LoginDAO loginDAO;
+    private final PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public MemberService(LoginDAO loginDAO, PasswordEncoder passwordEncoder) {
+        this.loginDAO = loginDAO;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    public ResponseVO singUp(MemberVO memberVO) throws Exception {
+        if (loginDAO.existMember(memberVO)) {
+            return ResponseVO.builder()
+                    .httpStatus(HttpStatus.CONFLICT)
+                    .message("아이디가 이미 존재합니다.")
+                    .build();
+        }
+
+        memberVO.setPassword(passwordEncoder.encode(memberVO.getPassword()));
+
+        loginDAO.insertMember(memberVO);
+
+        return ResponseVO.builder()
+                .httpStatus(HttpStatus.OK)
+                .message("회원가입이 완료되었습니다.")
+                .build();
+
+    }
+}
