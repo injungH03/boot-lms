@@ -7,6 +7,7 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <jsp:include page="/WEB-INF/jsp/atos/common/layout.jsp" />
+<link type="text/css" rel="stylesheet" href="<c:url value='/css/boardtest.css' />">
 <div class="board">
     <form:form name="boardForm" id="searchForm" action="<c:url value='/admin/member/boardList'/>" method="get">
         <h1>게시판 목록</h1>

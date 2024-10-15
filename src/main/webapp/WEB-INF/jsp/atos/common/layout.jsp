@@ -9,9 +9,9 @@
   <script type="text/javascript" src="<c:url value='/js/common/CommonUtil.js'/>" ></script>
   <script type="text/javascript" src="<c:url value='/js/common/FetchFunction.js'/>" ></script>
   <script type="text/javascript" src="<c:url value='/js/jquery/jquery.js'/>" ></script>
-  <link type="text/css" rel="stylesheet" href="<c:url value='/css/boardtest.css' />">
   <link type="text/css" rel="stylesheet" href="<c:url value='/css/common/paging.css' />">
   <link type="text/css" rel="stylesheet" href="<c:url value='/css/common/style.css' />">
+  <link type="text/css" rel="stylesheet" href="<c:url value='/css/common/common.css' />">
   <!-- 부트스트랩  -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
