@@ -45,7 +45,8 @@ public class AdminLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHand
         loginService.saveLoginHistory(username, roleName, request, "SUCCESS", "");
 
         // 기본 성공 핸들러 동작 유지
-        super.onAuthenticationSuccess(request, response, authentication);
+//        super.onAuthenticationSuccess(request, response, authentication);
+        response.sendRedirect("/admin/member/boardList");
     }
 
 

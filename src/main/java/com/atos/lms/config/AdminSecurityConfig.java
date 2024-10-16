@@ -41,7 +41,6 @@ public class AdminSecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/admin/login") // 커스텀 로그인 페이지 경로
                         .loginProcessingUrl("/admin/actionLogin") // 로그인 처리 URL
-                        .defaultSuccessUrl("/admin/member/boardList", true) // 로그인 성공 시 리다이렉트 URL
                         .successHandler(successHandler)  // 로그인 성공 핸들러
                         .failureHandler(failureHandler)  // 로그인 실패 핸들러
                         .permitAll()
