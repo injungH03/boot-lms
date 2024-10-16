@@ -25,5 +25,29 @@
 		    (#{id}, #{password}, #{name}, #{email}, #{roleId})
 	</insert>
 
+	<insert id="insertLoginHistory">
+		INSERT INTO ATOS_LOGIN_HISTORY
+			(
+				MEMBER_ID,
+				ROLE_NAME,
+				LOGIN_TIME,
+				IP_ADDRESS,
+				USER_AGENT,
+				DEVICE_TYPE,
+				LOGIN_STATUS,
+				LOGIN_FAIL_REASON
+			)
+		VALUES
+			(
+				#{memberId},
+				#{roleName},
+				#{loginTime},
+				#{ipAddress},
+				#{userAgent},
+				#{deviceType},
+				#{loginStatus},
+				#{loginFailReason}
+			)
+	</insert>
 	
 </mapper>

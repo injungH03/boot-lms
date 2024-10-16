@@ -1,10 +1,12 @@
 package com.atos.lms.security;
 
+import com.atos.lms.business.member.service.LoginService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.java.Log;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,11 +24,15 @@ import java.util.Map;
 public class JsonAuthFilter extends UsernamePasswordAuthenticationFilter {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-
     private final JwtTokenProvider jwtTokenProvider;
+    private final LoginService loginService;
 
-    public JsonAuthFilter(JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager) {
+    // 로그인한 유저의 아이디
+    private String username;
+
+    public JsonAuthFilter(JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, LoginService loginService) {
         this.jwtTokenProvider = jwtTokenProvider;
+        this.loginService = loginService;
         this.setAuthenticationManager(authenticationManager);
     }
 
@@ -39,7 +45,7 @@ public class JsonAuthFilter extends UsernamePasswordAuthenticationFilter {
 
         try {
             Map<String, String> authRequest = objectMapper.readValue(request.getInputStream(), Map.class);
-            String username = authRequest.get(getUsernameParameter());
+            username = authRequest.get(getUsernameParameter());
             String password = authRequest.get(getPasswordParameter());
 
 
@@ -74,7 +80,10 @@ public class JsonAuthFilter extends UsernamePasswordAuthenticationFilter {
         String role = authorities.stream()
                 .map(GrantedAuthority::getAuthority)
                 .findFirst()
-                .orElse("");
+                .orElse("ROLE_UNKNOWN");
+
+        // 로그인 이력 저장
+        loginService.saveLoginHistory(authResult.getName(), role, request, "SUCCESS", "");
 
         // JWT 토큰과 역할 정보를 함께 JSON 응답
         Map<String, String> tokenResponse = new HashMap<>();
@@ -89,6 +98,10 @@ public class JsonAuthFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed)
             throws IOException, ServletException {
+
+        // 로그인 이력 저장 (실패)
+        loginService.saveLoginHistory(username, "UNKNOWN", request, "FAILURE", failed.getMessage());
+
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");

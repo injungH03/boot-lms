@@ -42,7 +42,7 @@
 		<form name="loginForm" id="loginForm" action="<c:url value='/admin/actionLogin'/>" method="post" onsubmit="return actionLogin();">
 			<fieldset>
 				<!-- 로고 -->
-				<img class="logoImg" src="<c:url value='/images/atos/logo.png'/>" alt="login title image" title="login title image">
+				<img class="logoImg" src="<c:url value='/images/logo.png'/>" alt="login title image" title="login title image">
 				<!-- 로그인 입력 필드 -->
 				<c:set var="errorMessage" value="${sessionScope.errorMessage}" />
                 <c:if test="${not empty errorMessage}">
