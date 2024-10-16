@@ -3,4 +3,229 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.atos.lms.business.company.service.CompanyDAO">
 
+    <sql id="whereClause">
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="true">
+                a.STATUS != '1005'
+            </if>
+
+            <if test="statusCode != null and statusCode != ''">
+                AND a.STATUS = #{statusCode}
+            </if>
+            <if test="corpBiz != null and corpBiz != ''">
+                AND a.BIZ_REG_NO = #{corpBiz}
+            </if>
+            <if test="searchCnd != null and searchCnd != ''">
+                <if test="searchCnd == 0">
+                    AND a.CORP_NAME LIKE CONCAT ('%', #{searchWrd}, '%')
+                </if>
+                <if test="searchCnd == 1">
+                    AND a.TRAIN_MANAGER LIKE CONCAT ('%', #{searchWrd}, '%')
+                </if>
+                <if test="searchCnd == 2">
+                    AND a.BIZ_REG_NO LIKE CONCAT ('%', #{searchWrd}, '%')
+                </if>
+            </if>
+        </trim>
+    </sql>
+
+    <select id="selectCompanyList" parameterType="com.atos.lms.business.company.model.CompanyVO" resultType="com.atos.lms.business.company.model.CompanyVO">
+        SELECT
+        a.BIZ_REG_NO,
+        a.CORP_NAME,
+        a.REP_NAME,
+        a.EMP_COUNT,
+        a.TRAIN_MANAGER,
+        a.STATUS,
+        b.NAME AS statusName,
+        a.REG_DATE
+        FROM
+        ATOS_COMPANY a
+        LEFT JOIN
+        ATOS_STATUS b ON a.STATUS = b.CODE
+        <include refid="whereClause"/>
+        ORDER BY a.REG_DATE DESC
+        LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+    </select>
+
+    <select id="selectCompanyListCnt" parameterType="com.atos.lms.business.company.model.CompanyVO" resultType="int">
+        SELECT
+        COUNT(a.BIZ_REG_NO)
+        FROM
+        ATOS_COMPANY a
+        <include refid="whereClause"/>
+    </select>
+
+    <insert id="insertCompany" parameterType="com.atos.lms.business.company.model.CompanyVO">
+        INSERT INTO ATOS_COMPANY (
+        BIZ_REG_NO,
+        CORP_NAME,
+        REP_NAME,
+        BIZ_TYPE,
+        BIZ_ITEM,
+        PHONE_NO,
+        FAX_NO,
+        TAX_INVOICE,
+        EMP_COUNT,
+        TRAIN_COUNT,
+        TRAIN_MANAGER,
+        TRAIN_EMAIL,
+        TRAIN_PHONE,
+        TAX_MANAGER,
+        TAX_EMAIL,
+        TAX_PHONE,
+        STATUS,
+        MEMO,
+        REG_DATE,
+        ZIPCODE,
+        ADDR1,
+        ADDR2
+        ) VALUES (
+        #{bizRegNo},
+        #{corpName},
+        #{repName},
+        #{bizType},
+        #{bizItem},
+        #{phoneNo},
+        #{faxNo},
+        #{taxInvoice},
+        #{empCount},
+        #{trainCount},
+        #{trainManager},
+        #{trainEmail},
+        #{trainPhone},
+        #{taxManager},
+        #{taxEmail},
+        #{taxPhone},
+        '1002',
+        #{memo},
+        NOW(),
+        #{zipcode},
+        #{addr1},
+        #{addr2}
+        )
+    </insert>
+
+    <select id="checkDuplicateBizRegNo" parameterType="string" resultType="int">
+        SELECT COUNT(*) FROM ATOS_COMPANY WHERE BIZ_REG_NO = #{bizRegNo}
+    </select>
+
+    <select id="selectCompanyDetail" parameterType="string" resultType="com.atos.lms.business.company.model.CompanyVO">
+        SELECT
+        BIZ_REG_NO,
+        CORP_NAME,
+        REP_NAME,
+        BIZ_TYPE,
+        BIZ_ITEM,
+        PHONE_NO,
+        FAX_NO,
+        TAX_INVOICE,
+        EMP_COUNT,
+        TRAIN_COUNT,
+        TRAIN_MANAGER,
+        TRAIN_EMAIL,
+        TRAIN_PHONE,
+        TAX_MANAGER,
+        TAX_EMAIL,
+        TAX_PHONE,
+        STATUS,
+        MEMO,
+        REG_DATE,
+        ZIPCODE,
+        ADDR1,
+        ADDR2
+        FROM
+        ATOS_COMPANY
+        WHERE
+        BIZ_REG_NO = #{bizRegNo}
+    </select>
+
+    <update id="updateCompany" parameterType="com.atos.lms.business.company.model.CompanyVO">
+        UPDATE ATOS_COMPANY SET
+        CORP_NAME = #{corpName},
+        REP_NAME = #{repName},
+        BIZ_TYPE = #{bizType},
+        BIZ_ITEM = #{bizItem},
+        PHONE_NO = #{phoneNo},
+        FAX_NO = #{faxNo},
+        TAX_INVOICE = #{taxInvoice},
+        EMP_COUNT = #{empCount},
+        TRAIN_COUNT = #{trainCount},
+        TRAIN_MANAGER = #{trainManager},
+        TRAIN_EMAIL = #{trainEmail},
+        TRAIN_PHONE = #{trainPhone},
+        TAX_MANAGER = #{taxManager},
+        TAX_EMAIL = #{taxEmail},
+        TAX_PHONE = #{taxPhone},
+        MEMO = #{memo},
+        ZIPCODE = #{zipcode},
+        ADDR1 = #{addr1},
+        ADDR2 = #{addr2}
+        WHERE BIZ_REG_NO = #{bizRegNo}
+    </update>
+
+    <update id="deleteCompany" parameterType="string">
+        UPDATE ATOS_COMPANY
+        SET STATUS = '1005'
+        WHERE BIZ_REG_NO = #{bizRegNo}
+    </update>
+
+    <update id="deleteMembersByCompany" parameterType="string">
+        UPDATE ATOS_STUDENT
+        SET STATUS = '1005'
+        WHERE BIZ_REG_NO = #{bizRegNo}
+    </update>
+
+    <update id="updateStatus" parameterType="com.atos.lms.business.company.model.CompanyVO">
+        UPDATE ATOS_COMPANY
+        SET STATUS = #{status}
+        WHERE BIZ_REG_NO = #{bizRegNo}
+    </update>
+
+    <select id="companyListExcelDown" parameterType="com.atos.lms.business.company.model.CompanyVO" resultType="com.atos.lms.business.company.model.CompanyExcelDTO">
+        SELECT
+        BIZ_REG_NO AS bizRegNo,
+        CORP_NAME AS corpName,
+        REP_NAME AS repName,
+        BIZ_TYPE AS bizType,
+        BIZ_ITEM AS bizItem,
+        PHONE_NO AS phoneNo,
+        FAX_NO AS faxNo,
+        TAX_INVOICE AS taxInvoice,
+        EMP_COUNT AS empCount,
+        TRAIN_COUNT AS trainCount,
+        TRAIN_MANAGER AS trainManager,
+        TRAIN_EMAIL AS trainEmail,
+        TRAIN_PHONE AS trainPhone,
+        TAX_MANAGER AS taxManager,
+        TAX_EMAIL AS taxEmail,
+        TAX_PHONE AS taxPhone,
+        REG_DATE AS regDate,
+        ZIPCODE AS zipcode,
+        ADDR1 AS addr1,
+        ADDR2 AS addr2
+        FROM
+        ATOS_COMPANY a
+        <include refid="whereClause"/>
+        ORDER BY REG_DATE DESC
+    </select>
+
+    <select id="selectStatusCode" resultType="com.atos.lms.business.company.model.CompanyDTO">
+        SELECT
+            CODE AS companyStatus,
+            NAME AS statusName
+        FROM
+            ATOS_STATUS
+        WHERE CODE IN ('1001', '1002', '1003', '1004')
+    </select>
+
+    <select id="selectCompany" resultType="com.atos.lms.business.company.model.CompanyDTO">
+        SELECT
+            BIZ_REG_NO AS bizRegNo,
+            CORP_NAME AS corpName
+        FROM
+            ATOS_COMPANY
+    </select>
+
+
 </mapper>

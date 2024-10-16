@@ -1,7 +1,6 @@
 package com.atos.lms.business.company.model;
 
 
-import com.atos.lms.common.model.GeneralModel;
 import com.atos.lms.common.model.MasterVO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,7 +9,7 @@ import java.time.LocalDate;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class CompanyVO  extends MasterVO implements GeneralModel {
+public class CompanyVO extends MasterVO {
 
     private String bizRegNo; // 사업자등록번호
     private String corpName; // 업체명(법인명)
@@ -34,9 +33,6 @@ public class CompanyVO  extends MasterVO implements GeneralModel {
     private String zipcode; //우편번호
     private String addr1; //주소
     private String addr2; //상세주소
-
-
-
 
 
 }
