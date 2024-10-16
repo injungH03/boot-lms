@@ -164,23 +164,40 @@
         WHERE BIZ_REG_NO = #{bizRegNo}
     </update>
 
-    <update id="deleteCompany" parameterType="string">
-        UPDATE ATOS_COMPANY
-        SET STATUS = '1005'
-        WHERE BIZ_REG_NO = #{bizRegNo}
+    <update id="deleteMembersByCompany" parameterType="string">
+        UPDATE atos_member m
+        INNER JOIN atos_member_nomal mn ON m.ID = mn.MEMBER_ID
+        SET m.STATUS = '1005'
+        WHERE mn.BIZ_REG_NO = #{bizRegNo}
     </update>
 
-    <update id="deleteMembersByCompany" parameterType="string">
-        UPDATE ATOS_STUDENT
-        SET STATUS = '1005'
-        WHERE BIZ_REG_NO = #{bizRegNo}
-    </update>
 
     <update id="updateStatus" parameterType="com.atos.lms.business.company.model.CompanyVO">
         UPDATE ATOS_COMPANY
-        SET STATUS = #{status}
-        WHERE BIZ_REG_NO = #{bizRegNo}
+        SET STATUS = #{statusCode}
+        WHERE BIZ_REG_NO IN
+        <foreach item="bizRegNo" index="index" collection="corpBizList" open="(" separator="," close=")">
+            #{bizRegNo}
+        </foreach>
     </update>
+
+
+
+    <update id="updateMembersByCompany" parameterType="com.atos.lms.business.company.model.CompanyVO">
+        UPDATE atos_member m
+        INNER JOIN atos_member_nomal mn ON m.ID = mn.MEMBER_ID
+        SET m.STATUS = #{statusCode}
+        WHERE mn.BIZ_REG_NO IN
+        <foreach item="bizRegNo" index="index" collection="corpBizList" open="(" separator="," close=")">
+            #{bizRegNo}
+        </foreach>
+    </update>
+
+
+
+
+
+
 
     <select id="companyListExcelDown" parameterType="com.atos.lms.business.company.model.CompanyVO" resultType="com.atos.lms.business.company.model.CompanyExcelDTO">
         SELECT

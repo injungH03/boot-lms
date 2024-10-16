@@ -75,44 +75,5 @@ public class TestBoardController {
         return "atos/board/TestBoardDetail";
     }
 
-    @RequestMapping("/company/companyList")
-    public String companyList(@ModelAttribute("searchVO") TestBoardVO testBoardVO, ModelMap model) throws Exception {
-
-        PaginationInfo paginationInfo = new PaginationInfo();
-
-        paginationInfo.setCurrentPageNo(testBoardVO.getPageIndex());
-        paginationInfo.setRecordCountPerPage(testBoardVO.getPageUnit());
-        paginationInfo.setPageSize(testBoardVO.getPageSize());
-
-        System.out.println(">>>>>>>>>>>>getPageSize = " + paginationInfo.getPageSize());
-        System.out.println(">>>>>>>>>>>>getRecordCountPerPage = " + paginationInfo.getRecordCountPerPage());
-        System.out.println(">>>>>>>>>>>>testBoardVO.getPageIndex() = " + testBoardVO.getPageIndex());
-        System.out.println(">>>>>>>>>>>>getCurrentPageNo = " + paginationInfo.getCurrentPageNo());
-
-        testBoardVO.setFirstIndex(paginationInfo.getFirstRecordIndex());
-        testBoardVO.setLastIndex(paginationInfo.getLastRecordIndex());
-        testBoardVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
-
-        System.out.println(">>>>>>>>>>>>>>>>>getFirstIndex = " + testBoardVO.getFirstIndex());
-        System.out.println(">>>>>>>>>>>>>>>>>getLastIndex = " + testBoardVO.getLastIndex());
-        System.out.println(">>>>>>>>>>>>>>>>>getRecordCountPerPage = " + testBoardVO.getRecordCountPerPage());
-
-        Map<String, Object> map = testBoardService.selectBoardList(testBoardVO);
-
-        System.out.println("총갯수 = " + map.get("resultCnt"));
-
-
-        int totalcount = Integer.parseInt(String.valueOf(map.get("resultCnt")));
-
-        paginationInfo.setTotalRecordCount(totalcount);
-
-        model.addAttribute("resultList", map.get("resultList"));
-        model.addAttribute("paginationInfo", paginationInfo);
-
-
-        return "atos/board/TestBoardList";
-    }
-
-
 
 }
