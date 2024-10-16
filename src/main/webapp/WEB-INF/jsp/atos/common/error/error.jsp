@@ -45,7 +45,7 @@
     <h1 class="error-title">서버 오류</h1>
     <p class="error-message">${errorMessage} ${errorCode}</p>
     <p class="error-message">관리자에 문의 하세요</p>
-
+    <span>${debugMessage}</span>
     <a href="/" class="error-btn">Go to Homepage</a>
 
 </div>

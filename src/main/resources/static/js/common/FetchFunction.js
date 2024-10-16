@@ -13,6 +13,7 @@
  * 2024.09.16   김권영        String 데이터 추가
  * 2024.10.08   김권영        헤더 및 폼데이터 파일 업로드 처리 추가
  * 2024.10.12   김권영        보안 csrf토큰 추가
+ * 2024.10.16   김권영        에러 ResponseVO 활용
  */
 
 const myFetch = (args) => {
@@ -60,8 +61,14 @@ const myFetch = (args) => {
     }).done(resp => {
         args.success(resp);
     }).fail(err => {
-        if (args.error != null) {
-            args.error(typeof (err.responseJSON) === 'object' ? err.responseJSON.message : JSON.stringify(err));
-        }
-    });
-};
+              if (args.error != null) {
+                  if (err.responseJSON && typeof err.responseJSON === 'object') {
+                      const response = err.responseJSON;
+                      const errorMessage = response.message || '알 수 없는 오류가 발생했습니다.';
+                      args.error(errorMessage);
+                  } else {
+                      args.error(typeof (err.responseText) === 'string' ? err.responseText : JSON.stringify(err));
+                  }
+              }
+          });
+      };

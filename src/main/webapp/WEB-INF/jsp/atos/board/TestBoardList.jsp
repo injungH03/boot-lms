@@ -27,7 +27,6 @@
                 </li>
             </ul>
         </div>
-        <%--<input name="pageIndex" type="hidden" value="<c:out value='${searchVO.pageIndex}'/>">--%>
     </form:form>
     
     <table class="board_list">

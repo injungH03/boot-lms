@@ -12,8 +12,8 @@ public interface TestBoardDAO {
     int selectBoardListCnt(TestBoardVO testBoardVO);
     TestBoardVO selectBoardKey(TestBoardVO testBoardVO);
 
-    int insertBoard(TestBoardVO testBoardVO);
-    int updateBoard(TestBoardVO testBoardVO);
+    void insertBoard(TestBoardVO testBoardVO);
+    void updateBoard(TestBoardVO testBoardVO);
 
 
 
