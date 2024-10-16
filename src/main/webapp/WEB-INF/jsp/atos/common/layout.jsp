@@ -18,11 +18,11 @@
 </head>
 <script type="text/javascript">
   $(document).ready(function () {
-    var csrfParameterName = '${_csrf.parameterName}';  // CSRF 파라미터 이름
-    var csrfTokenValue = '${_csrf.token}';            // CSRF 토큰 값
+    //var csrfParameterName = '${_csrf.parameterName}';  // CSRF 파라미터 이름
+    //var csrfTokenValue = '${_csrf.token}';            // CSRF 토큰 값
 
-    console.log("CSRF Token Name: " + csrfParameterName);
-    console.log("CSRF Token Value: " + csrfTokenValue);
+    //console.log("CSRF Token Name: " + csrfParameterName);
+    //console.log("CSRF Token Value: " + csrfTokenValue);
 
 
     // 1. 로컬 스토리지에서 활성화된 헤더 및 서브 메뉴 정보 로드

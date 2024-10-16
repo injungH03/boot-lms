@@ -46,7 +46,7 @@ public class ApiSecurityConfig {
 
         AuthenticationManager authenticationManager = authenticationManager(http.getSharedObject(AuthenticationConfiguration.class));
 
-        JsonAuthFilter jsonAuthFilter = new JsonAuthFilter(jwtTokenProvider, authenticationManager);
+        JsonAuthFilter jsonAuthFilter = new JsonAuthFilter(jwtTokenProvider, authenticationManager, loginService);
         jsonAuthFilter.setFilterProcessesUrl("/api/login");
 
         JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtTokenProvider, loginService);
