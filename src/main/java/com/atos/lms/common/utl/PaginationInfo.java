@@ -11,8 +11,6 @@ public class PaginationInfo {
     private int firstRecordIndex;
     private int lastRecordIndex;
 
-    // Getter and Setter methods
-
     public int getCurrentPageNo() {
         return currentPageNo;
     }

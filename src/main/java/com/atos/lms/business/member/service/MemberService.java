@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class MemberService {
@@ -19,22 +20,13 @@ public class MemberService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public ResponseVO singUp(MemberVO memberVO) throws Exception {
+    public void signUp(MemberVO memberVO) throws Exception {
         if (loginDAO.existMember(memberVO)) {
-            return ResponseVO.builder()
-                    .httpStatus(HttpStatus.CONFLICT)
-                    .message("아이디가 이미 존재합니다.")
-                    .build();
+            throw new IllegalArgumentException("아이디가 이미 존재합니다.");
         }
 
         memberVO.setPassword(passwordEncoder.encode(memberVO.getPassword()));
 
         loginDAO.insertMember(memberVO);
-
-        return ResponseVO.builder()
-                .httpStatus(HttpStatus.OK)
-                .message("회원가입이 완료되었습니다.")
-                .build();
-
     }
 }

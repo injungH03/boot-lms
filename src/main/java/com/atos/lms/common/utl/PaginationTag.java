@@ -11,7 +11,6 @@ public class PaginationTag extends SimpleTagSupport {
     private String jsFunction;
     private String formId;
 
-    // Setter methods
     public void setPaginationInfo(PaginationInfo paginationInfo) {
         this.paginationInfo = paginationInfo;
     }
