@@ -30,7 +30,7 @@ public interface CompanyDAO {
 
     List<CompanyExcelDTO> companyListExcelDown(CompanyVO companyVO);
 
-    List<CompanyDTO> selectStatusCode();
+    List<CompanyDTO > selectStatusCode();
 
     List<CompanyDTO> selectCompany();
 

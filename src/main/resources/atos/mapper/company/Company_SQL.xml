@@ -164,6 +164,13 @@
         WHERE BIZ_REG_NO = #{bizRegNo}
     </update>
 
+    <update id="deleteCompany" parameterType="string">
+        UPDATE ATOS_COMPANY
+        SET STATUS = '1005'
+        WHERE BIZ_REG_NO = #{bizRegNo}
+    </update>
+
+
     <update id="deleteMembersByCompany" parameterType="string">
         UPDATE atos_member m
         INNER JOIN atos_member_nomal mn ON m.ID = mn.MEMBER_ID
