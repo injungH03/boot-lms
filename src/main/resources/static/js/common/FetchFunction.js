@@ -25,9 +25,9 @@ const myFetch = (args) => {
     };
 
     // CSRF 토큰을 헤더에 추가 (JSP에서 선언된 전역 변수 사용)
-    if (typeof csrfParameterName !== 'undefined' && typeof csrfTokenValue !== 'undefined') {
-        headers[csrfParameterName] = csrfTokenValue;
-    }
+    // if (typeof csrfParameterName !== 'undefined' && typeof csrfTokenValue !== 'undefined') {
+    //     headers[csrfParameterName] = csrfTokenValue;
+    // }
 
     if (args.isFormData) {
 	    const formElement = document.getElementById(args.data);

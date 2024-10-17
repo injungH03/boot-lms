@@ -13,6 +13,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.NoSuchElementException;
 
@@ -55,6 +56,11 @@ public class GlobalExceptionHandler {
     public Object handleInternalServerError(Exception ex, HttpServletRequest request) {
         logger.error("Exception: ", ex);
         return buildErrorResponse("500", "Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR, ex, request);
+    }
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public Object handleNoHandlerFoundException(NoHandlerFoundException ex, HttpServletRequest request) {
+        logger.warn("NoHandlerFoundException: ", ex);
+        return buildErrorResponse("404", "Page Not Found", HttpStatus.NOT_FOUND, ex, request);
     }
 
     private Object buildErrorResponse(String errorCode, String message, HttpStatus status, Exception ex, HttpServletRequest request) {
