@@ -67,11 +67,11 @@ public class CompanyService {
 
 */
 
-       public List<CompanyDTO> selectStatusCode() {
+       public List<CompanyVO> selectStatusCode() {
         return companyDAO.selectStatusCode();
     }
 
-    public List<CompanyDTO> selectCompany() {
+    public List<CompanyVO> selectCompany() {
         return companyDAO.selectCompany();
     }
 

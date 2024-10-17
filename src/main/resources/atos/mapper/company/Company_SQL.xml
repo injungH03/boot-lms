@@ -29,6 +29,9 @@
         </trim>
     </sql>
 
+
+
+  <!-- 업체 목록 조회 -->
     <select id="selectCompanyList" parameterType="com.atos.lms.business.company.model.CompanyVO" resultType="com.atos.lms.business.company.model.CompanyVO">
         SELECT
         a.BIZ_REG_NO,
@@ -48,6 +51,7 @@
         LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
     </select>
 
+    <!-- 업체 총 개수 조회 -->
     <select id="selectCompanyListCnt" parameterType="com.atos.lms.business.company.model.CompanyVO" resultType="int">
         SELECT
         COUNT(a.BIZ_REG_NO)
@@ -56,6 +60,7 @@
         <include refid="whereClause"/>
     </select>
 
+    <!-- 업체 등록 -->
     <insert id="insertCompany" parameterType="com.atos.lms.business.company.model.CompanyVO">
         INSERT INTO ATOS_COMPANY (
         BIZ_REG_NO,
@@ -106,11 +111,13 @@
         )
     </insert>
 
-    <select id="checkDuplicateBizRegNo" parameterType="string" resultType="int">
+    <!-- 사업자등록번호 중복 체크 (parameterType 수정) -->
+    <select id="checkDuplicateBizRegNo" parameterType="com.atos.lms.business.company.model.CompanyVO" resultType="int">
         SELECT COUNT(*) FROM ATOS_COMPANY WHERE BIZ_REG_NO = #{bizRegNo}
     </select>
 
-    <select id="selectCompanyDetail" parameterType="string" resultType="com.atos.lms.business.company.model.CompanyVO">
+    <!-- 업체 상세 정보 조회 (parameterType 수정) -->
+    <select id="selectCompanyDetail" parameterType="com.atos.lms.business.company.model.CompanyVO" resultType="com.atos.lms.business.company.model.CompanyVO">
         SELECT
         BIZ_REG_NO,
         CORP_NAME,
@@ -140,6 +147,7 @@
         BIZ_REG_NO = #{bizRegNo}
     </select>
 
+    <!-- 업체 정보 수정 -->
     <update id="updateCompany" parameterType="com.atos.lms.business.company.model.CompanyVO">
         UPDATE ATOS_COMPANY SET
         CORP_NAME = #{corpName},
@@ -164,48 +172,43 @@
         WHERE BIZ_REG_NO = #{bizRegNo}
     </update>
 
-    <update id="deleteCompany" parameterType="string">
+    <!-- 업체 삭제 (parameterType 수정) -->
+    <update id="deleteCompany" parameterType="com.atos.lms.business.company.model.CompanyVO">
         UPDATE ATOS_COMPANY
         SET STATUS = '1005'
         WHERE BIZ_REG_NO = #{bizRegNo}
     </update>
 
-
-    <update id="deleteMembersByCompany" parameterType="string">
+    <!-- 업체 소속 회원 삭제 (parameterType 수정) -->
+    <update id="deleteMembersByCompany" parameterType="com.atos.lms.business.company.model.CompanyVO">
         UPDATE atos_member m
         INNER JOIN atos_member_nomal mn ON m.ID = mn.MEMBER_ID
         SET m.STATUS = '1005'
         WHERE mn.BIZ_REG_NO = #{bizRegNo}
     </update>
 
-
-    <update id="updateStatus" parameterType="com.atos.lms.business.company.model.CompanyVO">
+    <!-- 업체 상태 업데이트 (기존 그대로 유지) -->
+    <update id="updateStatus" parameterType="com.atos.lms.business.company.model.CompanyDTO">
         UPDATE ATOS_COMPANY
-        SET STATUS = #{statusCode}
+        SET STATUS = #{companyStatus}
         WHERE BIZ_REG_NO IN
         <foreach item="bizRegNo" index="index" collection="corpBizList" open="(" separator="," close=")">
             #{bizRegNo}
         </foreach>
     </update>
 
-
-
-    <update id="updateMembersByCompany" parameterType="com.atos.lms.business.company.model.CompanyVO">
+    <!-- 업체 소속 회원 상태 업데이트 (기존 그대로 유지) -->
+    <update id="updateMembersByCompany" parameterType="com.atos.lms.business.company.model.CompanyDTO">
         UPDATE atos_member m
         INNER JOIN atos_member_nomal mn ON m.ID = mn.MEMBER_ID
-        SET m.STATUS = #{statusCode}
+        SET m.STATUS = #{companyStatus}
         WHERE mn.BIZ_REG_NO IN
         <foreach item="bizRegNo" index="index" collection="corpBizList" open="(" separator="," close=")">
             #{bizRegNo}
         </foreach>
     </update>
 
-
-
-
-
-
-
+    <!-- 엑셀 다운로드용 업체 목록 조회 -->
     <select id="companyListExcelDown" parameterType="com.atos.lms.business.company.model.CompanyVO" resultType="com.atos.lms.business.company.model.CompanyExcelDTO">
         SELECT
         BIZ_REG_NO AS bizRegNo,
@@ -234,6 +237,7 @@
         ORDER BY REG_DATE DESC
     </select>
 
+    <!-- 상태 코드 목록 조회 -->
     <select id="selectStatusCode" resultType="com.atos.lms.business.company.model.CompanyDTO">
         SELECT
             CODE AS companyStatus,
@@ -243,6 +247,7 @@
         WHERE CODE IN ('1001', '1002', '1003', '1004')
     </select>
 
+    <!-- 업체 목록 조회 -->
     <select id="selectCompany" resultType="com.atos.lms.business.company.model.CompanyDTO">
         SELECT
             BIZ_REG_NO AS bizRegNo,
@@ -250,6 +255,8 @@
         FROM
             ATOS_COMPANY
     </select>
+
+
 
 
 </mapper>

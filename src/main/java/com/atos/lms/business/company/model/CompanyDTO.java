@@ -10,7 +10,6 @@ import java.util.List;
 public class CompanyDTO implements GeneralModel {
 
     private List<String> corpBizList;
-
     private String companyStatus;
 
     private String id;          // 회원 식별자 (atos_member.ID)
