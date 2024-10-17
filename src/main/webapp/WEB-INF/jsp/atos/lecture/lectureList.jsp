@@ -11,7 +11,7 @@
 <div class="wrap">
 
 <div class="head-section">
-	<span>&nbsp;집합과정운영</span>
+	<span>&nbsp;</span>
 </div>
 
 <form id="searchForm" name="searchForm" action="<c:url value='/admin/education/lectureList'/>" method="get">
