@@ -6,15 +6,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><c:out value="${pageTitle}" /></title>
+
+    <!-- 부트스트랩  -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
   <script type="text/javascript" src="<c:url value='/js/common/CommonUtil.js'/>" ></script>
   <script type="text/javascript" src="<c:url value='/js/common/FetchFunction.js'/>" ></script>
   <script type="text/javascript" src="<c:url value='/js/jquery/jquery.js'/>" ></script>
   <link type="text/css" rel="stylesheet" href="<c:url value='/css/common/paging.css' />">
   <link type="text/css" rel="stylesheet" href="<c:url value='/css/common/style.css' />">
   <link type="text/css" rel="stylesheet" href="<c:url value='/css/common/common.css' />">
-  <!-- 부트스트랩  -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.19.3/jquery.validate.min.js"></script>
+  <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
 </head>
 <script type="text/javascript">
   $(document).ready(function () {

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atos.lms.common.service.CategoryDAO">
+
+
+	<sql id="whereClause">
+		<trim prefix="WHERE" prefixOverrides="AND">
+		
+			<!-- 전체 카테고리 사용 여부 조건 -->	
+			<if test="checkYn != null and checkYn != ''">
+				AND CD.USE_YN = #{checkYn}
+			</if>
+			
+			<!-- 메인 카테고리 검색 조건 -->			
+        	<if test="mtype != null and mtype.size > 0">
+	            AND CD.MAIN_CODE IN
+	            <foreach item="item" collection="mtype" open="(" separator="," close=")">
+	                #{item}
+	            </foreach>
+        	</if>
+        	
+        	<!-- 서브 카테고리 검색 조건 -->			
+        	<if test="stype != null and stype.size > 0">
+	            AND CD.SUB_CODE IN
+	            <foreach item="item" collection="stype" open="(" separator="," close=")">
+	                #{item}
+	            </foreach>
+        	</if>
+
+		</trim>
+	</sql>
+	
+	<sql id="whereClauseOne">
+		<trim prefix="WHERE" prefixOverrides="AND">
+		
+			<!-- 메인 카테고리 검색 조건 -->			
+        	<if test="mtype != null and mtype.size > 0">
+	            AND MAIN_CODE IN
+	            <foreach item="item" collection="mtype" open="(" separator="," close=")">
+	                #{item}
+	            </foreach>
+        	</if>
+        	
+        	<!-- 서브 카테고리 검색 조건 -->			
+        	<if test="stype != null and stype.size > 0">
+	            AND SUB_CODE IN
+	            <foreach item="item" collection="stype" open="(" separator="," close=")">
+	                #{item}
+	            </foreach>
+        	</if>
+
+		</trim>
+	</sql>
+	
+	<!-- 전체 카테고리 조회 -->
+	<select id="selectCategoryCodeAll" resultType="com.atos.lms.common.model.CategoryVO">
+		SELECT 
+			CD.CODE, CD.MAIN_CODE, CD.SUB_CODE, CD.USE_YN, CM.MAIN_NAME, CS.SUB_NAME
+		FROM
+			ATOS_CATEGORY_DETAIL CD
+		JOIN ATOS_CATEGORY_MAIN CM
+			ON CD.MAIN_CODE = CM.MAIN_CODE
+		JOIN ATOS_CATEGORY_SUB CS
+			ON CD.SUB_CODE = CS.SUB_CODE 
+			AND CD.MAIN_CODE = CS.MAIN_CODE
+		<include refid="whereClause" />
+	</select>
+	
+	<!-- 메인 카테고리 조회 -->
+	<select id="selectCategoryCodeMain" resultType="com.atos.lms.common.model.CategoryVO">
+		SELECT 
+			MAIN_CODE, MAIN_NAME, REG_DATE, REGISTER
+		FROM ATOS_CATEGORY_MAIN
+		<include refid="whereClauseOne" />
+			
+	</select>
+	
+	<!-- 서브 카테고리 조회 -->
+	<select id="selectCategoryCodeSub" resultType="com.atos.lms.common.model.CategoryVO">
+		SELECT 
+			SUB_CODE, SUB_NAME, REG_DATE, REGISTER
+		FROM ATOS_CATEGORY_SUB
+		<include refid="whereClauseOne" />
+	</select>
+	
+</mapper>

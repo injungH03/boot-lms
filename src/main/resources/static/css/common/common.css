@@ -58,10 +58,6 @@
 	vertical-align: middle;
 }
 
-.search-table select, .search-table input {
-	padding: 5px;
-}
-
 .radio-group {
 	display: flex;
 	justify-content: space-between;
@@ -173,7 +169,6 @@
 
 .d-flex input {
 	width:40%;
-	margin-left:5px;
 }
 .d-flex span {
 	line-height:35px;
@@ -192,7 +187,7 @@
 }
 .custom-width {
 	display: inline-block;
-	width:30%;
+	width:40%;
 }
 .student-table td {
 	width:35%;
@@ -201,6 +196,9 @@
 .popup-wrapper {
     padding: 20px 20px;;
     border-radius: 5px;
+}
+.course-table tbody tr:hover td {
+	cursor: pointer;
 }
 
 .course-table {

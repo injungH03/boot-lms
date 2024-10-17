@@ -36,7 +36,7 @@ public class AdminSecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/images/**", "/css/**", "/js/**", "/favicon.ico").permitAll()
                         .requestMatchers("/admin/login", "/admin/actionLogin", "/admin/login?error=true", "/admin/login?logout=true").permitAll()
-                        .anyRequest().hasRole("ADMIN") // 나머지 admin 경로는 ADMIN 역할만 허용
+                        .anyRequest().hasRole("ADMIN")
                 )
                 .formLogin(form -> form
                         .loginPage("/admin/login") // 커스텀 로그인 페이지 경로
@@ -48,8 +48,14 @@ public class AdminSecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/admin/logout") // 로그아웃 처리 URL
                         .logoutSuccessUrl("/admin/login?logout=true") // 로그아웃 성공 시 리다이렉트 URL
+                        .invalidateHttpSession(true) // 세션 무효화
                         .deleteCookies("JSESSIONID") // 세션 쿠키 삭제
                         .permitAll()
+                )
+                .sessionManagement(session -> session
+                        .invalidSessionUrl("/admin/login?sessionExpired=true")
+                        .maximumSessions(1) // 최대 세션 수 제한
+                        .expiredUrl("/admin/login?sessionExpired=true")
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
