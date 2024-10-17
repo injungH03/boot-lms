@@ -20,7 +20,7 @@ public interface CompanyDAO {
     void insertCompany(CompanyVO companyVO);
 
     // 사업자등록번호 중복 체크 (파라미터 타입 변경)
-    boolean checkDuplicateBizRegNo(CompanyVO companyVO);
+    int checkDuplicateBizRegNo(CompanyVO companyVO);
 
     // 업체 상세 정보 조회 (파라미터 타입 변경)
     CompanyVO selectCompanyDetail(CompanyVO companyVO);
