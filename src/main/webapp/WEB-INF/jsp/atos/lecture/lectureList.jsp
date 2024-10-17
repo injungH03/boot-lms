@@ -11,11 +11,11 @@
 <div class="wrap">
 
 <div class="head-section">
-	<span>&nbsp;</span>
+	<span>&nbsp;집합과정운영</span>
 </div>
 
 <form id="searchForm" name="searchForm" action="<c:url value='/admin/education/lectureList'/>" method="get">
-<!-- <input type="hidden" name="pageIndex" value="${searchVO.pageIndex}"> -->
+<input type="hidden" name="pageIndex" value="${searchVO.pageIndex}">
 <div class="tab-section">
 
 <input type="hidden" id="srcMainCode" name="srcMainCode"  value="" />
@@ -180,7 +180,7 @@ $(document).ready(function() {
 	
 	$('#regist').on('click', function(event){
 		event.preventDefault();
-		window.location.href = "<c:url value='/admin/education/lectureRegist.do'/>";
+		window.location.href = "<c:url value='/admin/education/lectureRegist'/>";
 	});
 	
 

@@ -32,6 +32,8 @@
         <appender-ref ref="console" />
     </logger>
 
+
+
     <!-- Root 로거 설정 -->
     <root level="debug">
         <appender-ref ref="console" />

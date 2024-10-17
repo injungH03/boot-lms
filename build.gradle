@@ -55,12 +55,6 @@ dependencies {
     implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
     implementation 'jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api:3.0.2'
     implementation 'org.glassfish.web:jakarta.servlet.jsp.jstl:3.0.1'
-//    implementation 'org.glassfish.web:jakarta.servlet.jsp.jstl:2.0.0'
-
-//    implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0'
-
-    //log4j 2
-//    implementation 'org.springframework.boot:spring-boot-starter-log4j2'
 
     //XSS 필터
     implementation 'org.apache.commons:commons-text:1.10.0'
@@ -72,8 +66,19 @@ dependencies {
     //JWT
     implementation 'com.auth0:java-jwt:4.4.0'
 
-    //Tag
+    // Tag
     implementation 'org.springframework.security:spring-security-taglibs'
+
+    // Apache POI for Excel (XSSF)
+    implementation 'org.apache.poi:poi-ooxml:5.3.0'
+    implementation 'org.apache.poi:poi:5.3.0'
+
+    // XML 빌드 처리 라이브러리
+    implementation 'org.apache.xmlbeans:xmlbeans:5.1.1'
+
+    // file
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
 
 }
 
