@@ -1,11 +1,15 @@
 package com.atos.lms.business.company.model;
 
 import com.atos.lms.common.model.GeneralModel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class CompanyExcelDTO implements GeneralModel {
 
 	private String bizRegNo; // 사업자등록번호

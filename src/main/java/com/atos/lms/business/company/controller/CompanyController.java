@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping("/admin/company")
 public class CompanyController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CompanyController.class);
@@ -34,8 +34,11 @@ public class CompanyController {
         this.companyService = companyService;
         this.sortFieldValidator = sortFieldValidator;
     }
+
+
+
   // 업체 목록 조회
-    @GetMapping("/company/companyList")
+    @GetMapping("/companyList")
     public String companyList(@ModelAttribute("companySearchVO") CompanyVO companyVO, ModelMap model) throws Exception {
         LOGGER.info("Entering companyList with search criteria: {}", companyVO);
 
@@ -72,7 +75,7 @@ public class CompanyController {
     }
 
     // 등록 페이지 이동
-    @GetMapping("/company/companyRegistView")
+    @GetMapping("/companyRegistView")
     public String companyRegistView(ModelMap model) throws Exception {
         LOGGER.info("Entering companyRegistView");
         List<CompanyVO> companyList = companyService.selectCompany();
@@ -82,7 +85,7 @@ public class CompanyController {
     }
 
     // 업체 등록
-    @PostMapping("/company/companyInsert")
+    @PostMapping("/companyInsert")
     @ResponseBody
     public ResponseEntity<ResponseVO<Object>> companyInsert(@RequestBody CompanyVO companyVO) {
         LOGGER.info("Entering companyInsert with data: {}", companyVO);
@@ -110,7 +113,7 @@ public class CompanyController {
     }
 
     // 사업자등록번호 중복 체크
-    @PostMapping("/company/checkDuplicateBizRegNo")
+    @PostMapping("/checkDuplicateBizRegNo")
     @ResponseBody
     public ResponseEntity<ResponseVO<Map<String, Boolean>>> checkDuplicateBizRegNo(@RequestBody Map<String, String> request) {
         String bizRegNo = request.get("bizRegNo");
@@ -129,7 +132,7 @@ public class CompanyController {
     }
 
     // 업체 상세 조회
-    @GetMapping("/company/companyDetail")
+    @GetMapping("/companyDetail")
     public String companyDetail(@RequestParam("bizRegNo") String bizRegNo, ModelMap model) throws Exception {
         LOGGER.info("Entering companyDetail with bizRegNo: {}", bizRegNo);
 
@@ -141,7 +144,7 @@ public class CompanyController {
     }
 
     // 수정 페이지 이동
-    @GetMapping("/company/companyUpdateView")
+    @GetMapping("/companyUpdateView")
     public String companyUpdateView(@RequestParam("bizRegNo") String bizRegNo, ModelMap model) throws Exception {
         LOGGER.info("Entering companyUpdateView with bizRegNo: {}", bizRegNo);
 
@@ -153,7 +156,7 @@ public class CompanyController {
     }
 
     // 업체 정보 수정
-    @PostMapping("/company/companyUpdate")
+    @PostMapping("/companyUpdate")
     @ResponseBody
     public ResponseEntity<ResponseVO<Object>> companyUpdate(@RequestBody CompanyVO companyVO) {
         LOGGER.info("Received company update request for: {}", companyVO);
@@ -172,7 +175,7 @@ public class CompanyController {
     }
 
     // 업체 삭제
-    @PostMapping("/company/deleteCompany")
+    @PostMapping("/deleteCompany")
     @ResponseBody
     public ResponseEntity<ResponseVO<Object>> deleteCompany(@RequestBody Map<String, String> request) {
         String bizRegNo = request.get("bizRegNo");
@@ -192,7 +195,7 @@ public class CompanyController {
     }
 
     // 업체 상태 변경
-    @PostMapping("/company/updateStatus")
+    @PostMapping("/updateStatus")
     @ResponseBody
     public ResponseEntity<ResponseVO<Object>> updateCompanyStatus(@RequestBody Map<String, String> request) {
         String bizRegNos = request.get("bizRegNos");

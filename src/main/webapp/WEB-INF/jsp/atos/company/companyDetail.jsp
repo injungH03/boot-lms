@@ -49,10 +49,11 @@
             </tr>
             <tr>
                 <th>주소(우편번호)</th>
-                <td colspan="3">
+                <td colspan="1">
                     <c:out value="${company.zipcode}" />
                     <c:out value="${company.addr1}" /> <c:out value="${company.addr2}" />
                 </td>
+                <th colspan="2"></th>
             </tr>
             <tr>
                 <th>메모</th>
@@ -64,7 +65,8 @@
             </tr>
             <tr>
                 <th>교육 담당자명</th>
-                <td colspan="3"><c:out value="${company.trainManager}" /></td>
+                <td colspan="1"><c:out value="${company.trainManager}" /></td>
+                <th colspan="2"></th>
             </tr>
             <tr>
                 <th>교육 담당자 이메일</th>
@@ -74,7 +76,8 @@
             </tr>
             <tr>
                 <th>계산서 담당자명</th>
-                <td colspan="3"><c:out value="${company.taxManager}" /></td>
+                <td colspan="1"><c:out value="${company.taxManager}" /></td>
+                <th colspan="2"></th>
             </tr>
             <tr>
                 <th>계산서 담당자 이메일</th>

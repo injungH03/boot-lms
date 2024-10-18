@@ -2,11 +2,15 @@ package com.atos.lms.business.company.model;
 
 
 import com.atos.lms.common.model.GeneralModel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class CompanyDTO implements GeneralModel {
 
     private List<String> corpBizList;

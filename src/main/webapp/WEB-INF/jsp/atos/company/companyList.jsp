@@ -23,7 +23,6 @@
         <input type="hidden" name="pageIndex" value="${companySearchVO.pageIndex}">
 
         <div class="table-section">
-
             <table class="search-table">
                 <tr>
                     <th class="custom-th-width">상태</th>

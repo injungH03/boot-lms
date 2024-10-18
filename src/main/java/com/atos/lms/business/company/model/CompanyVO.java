@@ -2,13 +2,15 @@ package com.atos.lms.business.company.model;
 
 
 import com.atos.lms.common.model.MasterVO;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.time.LocalDate;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class CompanyVO extends MasterVO {
 
     private String bizRegNo; // 사업자등록번호

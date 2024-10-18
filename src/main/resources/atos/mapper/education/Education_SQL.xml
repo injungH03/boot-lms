@@ -4,4 +4,269 @@
 <mapper namespace="com.atos.lms.business.education.service.EducationDAO">
 
 
+<sql id="whereClause">
+        <trim prefix="WHERE" prefixOverrides="AND">
+            a.STATUS != '1005'  <!-- 기본 조건 -->
+            AND d.USE_YN = 'Y'  <!-- 'USE_YN' 조건은 항상 포함 -->
+            <if test="statusCode != null and statusCode != ''">
+                AND a.STATUS = #{statusCode}
+            </if>
+            <if test="eduCode != null and eduCode != ''">
+                AND a.EDU_CODE = #{eduCode}
+            </if>
+            <if test="searchWrd != null and searchWrd != ''">
+                <choose>
+                    <when test="searchCnd == 0">
+                        AND a.TITLE LIKE CONCAT('%', #{searchWrd}, '%')  <!-- 교육명으로 검색 -->
+                    </when>
+                    <when test="searchCnd == 1">
+                        AND CAST(a.TRAINING_TIME AS CHAR) LIKE CONCAT('%', #{searchWrd}, '%')  <!-- 교육 시간으로 검색 -->
+                    </when>
+                    <when test="searchCnd == 2">
+                        AND DATE_FORMAT(a.REG_DATE, '%Y-%m-%d') LIKE CONCAT('%', #{searchWrd}, '%')  <!-- 등록일로 검색 -->
+                    </when>
+                    <otherwise>
+                        <!-- 검색 조건이 없을 경우 모든 데이터 조회 -->
+                        AND (
+                            a.TITLE LIKE CONCAT('%', #{searchWrd}, '%')
+                            OR CAST(a.TRAINING_TIME AS CHAR) LIKE CONCAT('%', #{searchWrd}, '%')
+                            OR DATE_FORMAT(a.REG_DATE, '%Y-%m-%d') LIKE CONCAT('%', #{searchWrd}, '%')
+                            OR a.REGISTER LIKE CONCAT('%', #{searchWrd}, '%')
+                        )
+                    </otherwise>
+                </choose>
+            </if>
+        </trim>
+    </sql>
+
+    <!-- 교육 과정 리스트 조회 -->
+    <select id="selectEducationList" parameterType="com.atos.lms.business.education.model.EducationVO" resultType="com.atos.lms.business.education.model.EducationVO">
+        SELECT
+            a.EDU_CODE,
+            a.TITLE,
+            a.STATUS AS statusCode,
+            s.NAME AS statusName,  <!-- 상태 명칭 -->
+            m.MAIN_NAME AS mainName,  <!-- 대분류 명칭 -->
+            sub.SUB_NAME AS subName,  <!-- 중분류 명칭 -->
+            a.TRAINING_TIME,  <!-- 교육 시간 코드 -->
+            a.REG_DATE,  <!-- 등록일 추가 -->
+            a.REGISTER  <!-- 등록자 추가 -->
+        FROM
+            ATOS_EDUCATION a
+        LEFT JOIN
+            ATOS_STATUS s ON a.STATUS = s.CODE  <!-- 상태 코드와 상태 명칭 매핑 -->
+        LEFT JOIN
+            ATOS_CATEGORY_DETAIL d ON a.CATEGORY = d.CODE
+        LEFT JOIN
+            ATOS_CATEGORY_MAIN m ON d.MAIN_CODE = m.MAIN_CODE
+        LEFT JOIN
+            ATOS_CATEGORY_SUB sub ON d.SUB_CODE = sub.SUB_CODE
+        <include refid="whereClause" />  <!-- whereClause에 USE_YN 포함 -->
+        GROUP BY
+            a.EDU_CODE, a.TITLE, a.STATUS, s.NAME, m.MAIN_NAME, sub.SUB_NAME, a.TRAINING_TIME, a.REG_DATE, a.REGISTER
+        ORDER BY a.EDU_CODE DESC
+        LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+    </select>
+
+    <!-- 교육 과정 총 개수 조회 -->
+    <select id="selectEducationListCnt" parameterType="com.atos.lms.business.education.model.EducationVO" resultType="int">
+        SELECT
+            COUNT(a.EDU_CODE)
+        FROM
+            ATOS_EDUCATION a
+        JOIN
+            ATOS_CATEGORY_DETAIL d ON a.CATEGORY = d.CODE
+        <include refid="whereClause" />  <!-- whereClause에 USE_YN 포함 -->
+    </select>
+
+    <!-- 상태 코드 조회 -->
+    <select id="selectStatusCode" resultType="com.atos.lms.business.education.model.EducationMasterVO">
+        SELECT
+            CODE AS statusCode,
+            NAME AS statusName
+        FROM
+            ATOS_STATUS
+        WHERE CODE IN ('4001', '4002')
+    </select>
+
+    <!-- 상태 업데이트 쿼리 -->
+    <update id="updateStatus">
+        UPDATE ATOS_EDUCATION
+        SET STATUS = #{statusCode}
+        WHERE EDU_CODE IN
+        <foreach item="eduCode" collection="eduCodeList" open="(" separator="," close=")">
+            #{eduCode}
+        </foreach>
+    </update>
+
+    <!-- 교육 과정 등록 -->
+    <insert id="insertEducation" parameterType="com.atos.lms.business.education.model.EducationVO">
+        INSERT INTO ATOS_EDUCATION(
+            TITLE,
+            CATEGORY,
+            DESCRIPTION,
+            OBJECTIVE,
+            COMPLETION_CRITERIA,
+            NOTE,
+            TRAINING_TIME,
+            REGISTER  <!-- 등록자 추가 -->
+        )
+        VALUES(
+            #{title},
+            #{category},
+            #{description},
+            #{objective},
+            #{completionCriteria},
+            #{note},
+            #{trainingTime},
+            #{register}  <!-- 등록자 값 설정 -->
+        )
+    </insert>
+
+    <!-- 카테고리 리스트 조회 -->
+    <select id="selectAllCategoryList" resultType="com.atos.lms.business.education.model.EducationVO">
+        SELECT
+            d.CODE,  <!-- 세부 정보 코드 -->
+            m.MAIN_CODE, m.MAIN_NAME,  <!-- 대분류 코드 및 명칭 -->
+            sub.SUB_CODE, sub.SUB_NAME  <!-- 중분류 코드 및 명칭 -->
+        FROM
+            ATOS_CATEGORY_DETAIL d
+        JOIN
+            ATOS_CATEGORY_MAIN m ON d.MAIN_CODE = m.MAIN_CODE  <!-- 대분류 코드로 조인 -->
+        JOIN
+            ATOS_CATEGORY_SUB sub ON d.SUB_CODE = sub.SUB_CODE  <!-- 중분류 코드로 조인 -->
+        WHERE
+            d.USE_YN = 'Y'  <!-- 사용 여부 필터링 -->
+        GROUP BY
+            d.CODE, m.MAIN_CODE, sub.SUB_CODE  <!-- 그룹화하여 중복 제거 -->
+        ORDER BY
+            m.MAIN_CODE, sub.SUB_CODE, d.CODE
+    </select>
+
+    <!-- 수료 조건 조회 쿼리 -->
+    <select id="selectCompletionCriteria" resultType="com.atos.lms.business.education.model.EducationMasterVO">
+        SELECT
+            CODE AS completionCode,
+            RATE AS completionRate,
+            SCORE AS completionScore,
+            SURVEY AS completionSurvey
+        FROM
+            ATOS_COMPLETION_CRITERIA
+    </select>
+
+    <!-- 엑셀 다운로드 쿼리 -->
+    <select id="selectEducationListForExcel" parameterType="com.atos.lms.business.education.model.EducationVO" resultType="com.atos.lms.business.education.model.EducationExcelDTO">
+        SELECT
+            a.TITLE AS title,                            <!-- 교육명 -->
+            CONCAT_WS(' > ', m.MAIN_NAME, sub.SUB_NAME) AS category,  <!-- 교육 분류 명칭 (대분류 > 중분류) -->
+            a.DESCRIPTION AS description,                <!-- 과정소개 -->
+            a.OBJECTIVE AS objective,                    <!-- 과정목표 -->
+            CONCAT_WS('/', IFNULL(c.RATE, 'N/A'), IFNULL(c.SCORE, 'N/A'), IFNULL(c.SURVEY, 'N/A')) AS completionCriteria, <!-- 수료조건 (진도율/시험 점수/설문 유무) -->
+            a.NOTE AS note,                              <!-- 비고 -->
+            s.NAME AS status,                            <!-- 상태명 -->
+            a.TRAINING_TIME AS trainingTime,             <!-- 교육시간 -->
+            a.REG_DATE AS regDate,                       <!-- 등록일 -->
+            a.REGISTER AS register                       <!-- 등록자 -->
+        FROM
+            ATOS_EDUCATION a
+        LEFT JOIN
+            ATOS_COMPLETION_CRITERIA c ON a.COMPLETION_CRITERIA = c.CODE  <!-- 수료 조건과 JOIN -->
+        JOIN
+            ATOS_CATEGORY_DETAIL d ON a.CATEGORY = d.CODE  <!-- 대분류, 중분류 코드와 명칭을 JOIN -->
+        JOIN
+            ATOS_CATEGORY_MAIN m ON d.MAIN_CODE = m.MAIN_CODE  <!-- 대분류 -->
+        JOIN
+            ATOS_CATEGORY_SUB sub ON d.SUB_CODE = sub.SUB_CODE  <!-- 중분류 -->
+        LEFT JOIN
+            ATOS_STATUS s ON a.STATUS = s.CODE  <!-- 상태 코드와 명칭을 JOIN -->
+        WHERE
+            a.STATUS != '1005'  <!-- 삭제된 상태는 제외 -->
+        ORDER BY
+            a.REG_DATE DESC  <!-- 등록일 기준 내림차순 정렬 -->
+    </select>
+
+    <!-- 교육 과정 상세 조회 -->
+    <select id="selectEducationDetail" parameterType="int" resultType="com.atos.lms.business.education.model.EducationVO">
+        SELECT
+            e.EDU_CODE,
+            e.TITLE,
+            e.DESCRIPTION,
+            e.OBJECTIVE,
+            e.COMPLETION_CRITERIA,
+            c.RATE AS completionRate,       <!-- 수료 조건: 진도율 -->
+            c.SCORE AS completionScore,     <!-- 수료 조건: 시험 점수 -->
+            c.SURVEY AS completionSurvey,   <!-- 수료 조건: 설문 유무 -->
+            e.CATEGORY,
+            m.MAIN_NAME AS mainName,         <!-- 대분류 명칭 -->
+            sub.SUB_NAME AS subName,         <!-- 중분류 명칭 -->
+            e.TRAINING_TIME,
+            e.NOTE,
+            e.STATUS,
+            e.REG_DATE,
+            e.REGISTER
+        FROM
+            ATOS_EDUCATION e
+        LEFT JOIN
+            ATOS_COMPLETION_CRITERIA c ON e.COMPLETION_CRITERIA = c.CODE   <!-- 수료 조건 연결 -->
+        LEFT JOIN
+            ATOS_TRAINING_TIME t ON e.TRAINING_TIME = t.CODE               <!-- 교육 시간 연결 -->
+        LEFT JOIN
+            ATOS_CATEGORY_DETAIL d ON e.CATEGORY = d.CODE                  <!-- 카테고리 연결 -->
+        LEFT JOIN
+            ATOS_CATEGORY_MAIN m ON d.MAIN_CODE = m.MAIN_CODE              <!-- 대분류 연결 -->
+        LEFT JOIN
+            ATOS_CATEGORY_SUB sub ON d.SUB_CODE = sub.SUB_CODE             <!-- 중분류 연결 -->
+        WHERE
+            e.EDU_CODE = #{eduCode}   <!-- 교육 코드로 상세 정보 조회 -->
+        GROUP BY
+            e.EDU_CODE,
+            e.TITLE,
+            e.DESCRIPTION,
+            e.OBJECTIVE,
+            e.COMPLETION_CRITERIA,
+            c.RATE,
+            c.SCORE,
+            c.SURVEY,
+            e.CATEGORY,
+            m.MAIN_NAME,
+            sub.SUB_NAME,
+            e.TRAINING_TIME,
+            e.NOTE,
+            e.STATUS,
+            e.REG_DATE,
+            e.REGISTER
+    </select>
+
+    <!-- 교육 과정 업데이트 쿼리 -->
+    <update id="updateEducation" parameterType="com.atos.lms.business.education.model.EducationVO">
+        UPDATE ATOS_EDUCATION
+        SET
+            TITLE = #{title},
+            CATEGORY = #{category},
+            DESCRIPTION = #{description},
+            OBJECTIVE = #{objective},
+            COMPLETION_CRITERIA = #{completionCriteria},
+            NOTE = #{note},
+            TRAINING_TIME = #{trainingTime},
+            REGISTER = #{register}
+        WHERE
+            EDU_CODE = #{eduCode}
+    </update>
+
+    <!-- 교육 상태 '삭제'로 변경 -->
+    <update id="deleteEducationByEduCode">
+        UPDATE ATOS_EDUCATION
+        SET STATUS = '1005'  <!-- '삭제' 상태로 변경 -->
+        WHERE EDU_CODE = #{eduCode}
+    </update>
+
+    <!-- 강의 상태 '폐강'으로 변경 -->
+    <update id="deleteLecturesByEduCode">
+        UPDATE ATOS_LECTURE
+        SET STATUS = '4002'  <!-- '폐강' 상태로 변경 -->
+        WHERE EDUCATION = #{eduCode}
+    </update>
+
+
+
 </mapper>
