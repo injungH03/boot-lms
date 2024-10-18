@@ -6,7 +6,11 @@
 <%@ taglib prefix="pagination" uri="/WEB-INF/customtag/pagination.tld" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
+
+
 <link type="text/css" rel="stylesheet" href="<c:url value='/css/common/common.css' />">
+
+
 <jsp:include page="/WEB-INF/jsp/atos/common/layout.jsp" />
 
 <div class="wrap">
@@ -23,7 +27,7 @@
             <table class="search-table">
                 <tr>
                     <th class="custom-th-width">상태</th>
-                    <td colspan="2">
+                    <td colspan="1">
                         <div class="d-flex">
                             <select name="statusCode" class="form-select search-select me-2">
                                 <option value="">전체</option>
@@ -118,6 +122,8 @@
 
 </div>
 
+
+
 <!-- 상태 변경 모달 -->
 <div id="statusModal" class="modal fade" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -145,28 +151,33 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
         <button type="button" class="btn btn-primary" id="confirmStatusChangeBtn">확인</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
       </div>
     </div>
   </div>
 </div>
 
+
+
 <script>
 $(document).ready(function() {
-    // 전체 선택/해제 기능
+     // 전체 선택/해제 기능
     $('#checkAll').on('click', function() {
         $('tbody input[name="rowCheck"]').prop('checked', this.checked);
     });
 
     // 상태변경 버튼 클릭 시 모달 열기
-    $('#statusUpdateBtn').on('click', function() {
+    $('#statusUpdateBtn').on('click', function(event) {
+        event.preventDefault(); // 기본 폼 제출 방지
+
         var selectedBizNos = [];
         $('tbody input[name="rowCheck"]:checked').each(function() {
             selectedBizNos.push($(this).val());
         });
 
         if (selectedBizNos.length > 0) {
+            // 선택된 사업자 번호가 있는 경우에만 모달을 띄움
             $('#statusModal').data('bizNos', selectedBizNos).modal('show');
         } else {
             alert("상태를 변경할 업체를 선택해주세요.");

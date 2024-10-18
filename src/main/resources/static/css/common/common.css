@@ -288,3 +288,14 @@ label.error {
     margin-top: 5px;
     margin-left: 5px;
 }
+
+
+
+/*************************추가 및 커스텀 CSS (Hwang)**********************************/
+
+
+.searchC-table {
+    width: 80%; /* 테이블 너비를 80%로 줄임 */
+    max-width: 1200px;
+    margin: 0 auto; /* 가운데 정렬 */
+}

@@ -28,24 +28,24 @@
         <th>사업장명</th>
         <td><input type="text" name="corpName" class="form-control custom-width" placeholder="사업장명을 입력하세요" /></td>
         <th>사업자등록번호</th>
-        <td><input type="text" name="bizRegNo" class="form-control custom-width" placeholder="사업자등록번호를 입력하세요" /></td>
+        <td><input type="text" id="bizRegNo" name="bizRegNo" class="form-control custom-width" placeholder="사업자등록번호를 입력하세요" maxlength="10" /></td>
     </tr>
     <tr>
         <th>주소</th>
-        <td >
-        <div class="d-flex align-items-center">
-            <input type="text" id="zipcode" name="zipcode" class="form-control me-2 custom-width" placeholder="우편번호를 검색해주세요" readonly />
-            <button type="button" class="btn btn-sm btn-primary" id="addressSearchButton">주소검색</button>
-        </div>
-        <br/>
+        <td colspan="1">
+          <div class="mt-2">
+           <input type="text" id="zipcode" name="zipcode" class="form-control me-2 custom-width" placeholder="우편번호를 검색해주세요" readonly />
+           <button type="button" class="btn btn-sm btn-primary" id="addressSearchButton">주소검색</button>
+          </div>
 
-            <input type="text" id="address" name="addr1" class="form-control me-2 custom-width" placeholder="주소를 검색해주세요" readonly />
+          <div class="mt-2">
+            <input type="text" id="addr1" name="addr1" class="form-control me-2 custom-width" placeholder="주소를 검색해주세요" readonly />
+            <input type="text" id="addr2" name="addr2" class="form-control mt-2 custom-width" placeholder="상세주소를 입력하세요" disabled/>
+          </div>
 
-  
-            <input type="text" id="detailedAddress" name="addr2" class="form-control mt-2 custom-width" placeholder="상세주소를 입력하세요" />
 
         </td>
-        <th colspan="3"></th>
+        <th colspan="2"></th>
     </tr>
     <tr>
         <th>대표자명</th>
@@ -77,7 +77,7 @@
     <tr>
         <th>메모</th>
         <td colspan="3">
-            <textarea id="memo" name="memo" class="form-control custom-width" rows="4" ></textarea>
+            <textarea id="memo" name="memo" class="form-control" rows="4" ></textarea>
         </td>
     </tr>
     <tr>
@@ -137,10 +137,6 @@ $(document).ready(function() {
                 required: true,
                 maxlength: 10
             },
-            zipcode: {
-                required: true,
-                maxlength: 5
-            },
             addr1: {
                 required: true,
                 maxlength: 300
@@ -180,17 +176,11 @@ $(document).ready(function() {
                 required: "사업자등록번호를 입력하세요.",
                 maxlength: "사업자등록번호는 최대 10자까지 입력 가능합니다."
             },
-            zipcode: {
-                required: "우편번호를 검색하세요.",
-                maxlength: "우편번호는 최대 5자까지 입력 가능합니다."
-            },
             addr1: {
                 required: "주소를 검색하세요.",
-                maxlength: "주소는 최대 300자까지 입력 가능합니다."
             },
             addr2: {
                 required: "상세 주소를 입력하세요.",
-                maxlength: "상세 주소는 최대 300자까지 입력 가능합니다."
             },
             repName: {
                 required: "대표자명을 입력하세요.",
@@ -202,7 +192,6 @@ $(document).ready(function() {
             },
             bizItem: {
                 required: "종목을 입력하세요.",
-                maxlength: "종목은 최대 60자까지 입력 가능합니다."
             },
             phoneNo: {
                 required: "전화번호를 입력하세요.",
@@ -211,7 +200,6 @@ $(document).ready(function() {
             taxInvoice: {
                 required: "이메일을 입력하세요.",
                 email: "유효한 이메일 주소를 입력하세요.",
-                maxlength: "이메일은 최대 50자까지 입력 가능합니다."
             }
         },
         errorElement: 'div',
@@ -231,30 +219,109 @@ $(document).ready(function() {
     // 등록 버튼 클릭 이벤트
     $('#submitBtn').click(function(event) {
         event.preventDefault();
+        
         if ($("#registForm").valid()) {
+            // 폼 데이터 JSON 변환
             var formData = $('#registForm').serializeArray();
             var jsonData = {};
-            $(formData).each(function(index, obj){
+            $(formData).each(function(index, obj) {
                 jsonData[obj.name] = obj.value;
             });
 
+            // 사업자등록번호 중복 체크 후 등록 요청
+            var bizRegNo = jsonData['bizRegNo'];
             $.ajax({
-                url: '<c:url value="/company/companyInsert" />',
+                url: '<c:url value="/admin/company/checkDuplicateBizRegNo" />', // 중복 체크 URL
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify(jsonData),
+                data: JSON.stringify({ bizRegNo: bizRegNo }),
                 success: function(response) {
-                    alert(response.message || "등록이 완료되었습니다.");
-                    window.location.href = "<c:url value='/company/companyList.do' />";
+                    if (response.result.duplicate) {
+                        alert("이미 존재하는 사업자등록번호입니다.");
+                    } else {
+                        // 중복 없을 경우 등록 처리
+                        $.ajax({
+                            url: '<c:url value="/admin/company/companyInsert" />',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify(jsonData),
+                            success: function(response) {
+                                alert(response.message || "등록이 완료되었습니다.");
+                                window.location.href = "<c:url value='/admin/company/companyList' />";
+                            },
+                            error: function(jqXHR, textStatus, errorThrown) {
+                                alert('등록이 실패하였습니다.');
+                            }
+                        });
+                    }
                 },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    alert('등록이 실패하였습니다.');
+                error: function() {
+                    alert("중복 확인 중 오류가 발생했습니다.");
                 }
             });
         } else {
             alert("필수 입력란을 확인해주세요.");
         }
     });
+
+
+
+       $('#addressSearchButton').on('click', function() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    // 우편번호와 주소를 각각 설정
+                    $('#zipcode').val(data.zonecode); // 우편번호 설정
+                    $('#addr1').val(data.address); // 기본 주소 설정
+                    $('#addr1').valid(); // 유효성 검사를 다시 실행하여 오류 제거
+                    $('#addr2').prop('disabled', false).focus(); // 상세주소 입력 필드로 포커스를 이동
+                   
+    
+                }
+            }).open();
+        });
+
+
+
+// 메모란의 글자 수 제한 기능 추가
+$('#memo').on('input', function() {
+    var text = $(this).val();
+    var koreanCharCount = (text.match(/[\u3131-\uD79D]/g) || []).length; // 한글 글자 수
+    var otherCharCount = text.length - koreanCharCount; // 한글 외 글자 수
+
+    // 한글은 1000자, 영문은 1500자 제한
+    if (koreanCharCount > 1000 || otherCharCount > 1500) {
+        alert('메모란은 한글 1000자, 영문 1500자로 제한됩니다.');
+        $(this).val(text.substring(0, 1000 + 1500)); // 한글과 영문 합쳐서 2500자로 제한
+    }
+});
+
+// 중복 체크를 위한 AJAX 로직
+$('#bizRegNo').on('focusout', function() {
+    var bizRegNo = $(this).val();
+    if (bizRegNo) {
+        $.ajax({
+            url: '<c:url value="/admin/company/checkDuplicateBizRegNo" />', // 컨트롤러에서 중복 체크 URL
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ bizRegNo: bizRegNo }),
+            success: function(response) {
+                if (response.result.duplicate) {
+                    alert("이미 존재하는 사업자등록번호입니다.");
+                    $('#bizRegNo').addClass('is-invalid');
+                } else {
+                    $('#bizRegNo').removeClass('is-invalid');
+                    alert("사용 가능한 사업자등록번호입니다.");
+                }
+            },
+            error: function() {
+                alert("중복 확인 중 오류가 발생했습니다.");
+            }
+        });
+    }
+});
+
+
+
 });
 
 

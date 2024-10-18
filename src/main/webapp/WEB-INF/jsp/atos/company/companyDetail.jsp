@@ -85,9 +85,9 @@
         </table>
 
         <div class="mt-3">
-            <button type="submit" class="btn btn-success me-2">수정</button>
-            <button type="button" class="btn btn-secondary me-2">목록</button>
-            <button type="button" class="btn btn-danger" style="float:right">삭제</button>
+            <button type="button" class="btn btn-success me-2" id="updateButton">수정</button>
+            <button type="button" class="btn btn-secondary me-2" id="listButton">목록</button>
+            <button type="button" class="btn btn-danger" id="deleteButton" style="float:right">삭제</button>
         </div>
 </div>
 
@@ -96,38 +96,56 @@
 
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // 수정 버튼 클릭 시 업체 수정 페이지로 이동
-        document.getElementById('updateButton').addEventListener('click', function() {
-            var bizRegNo = '<c:out value="${company.bizRegNo}" />';
-            window.location.href = "<c:url value='/admin/company/companyUpdateView' />?bizRegNo=" + bizRegNo;
-        });
 
-        // 삭제 버튼 클릭 시 AJAX 요청을 통해 업체 삭제
-        document.getElementById('deleteButton').addEventListener('click', function() {
-            if(confirm("정말 삭제하시겠습니까?")) {
-                var bizRegNo = '<c:out value="${company.bizRegNo}" />';
-                fetch('<c:url value="/admin/company/deleteCompany" />', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ bizRegNo: bizRegNo })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === "SUCCESS") { // ResponseVO의 'status' 필드 확인
-                        alert('삭제가 완료되었습니다.');
-                        window.location.href = "<c:url value='/admin/company/companyList' />";
-                    } else {
-                        alert('삭제에 실패했습니다: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('삭제 중 오류 발생:', error);
-                    alert('삭제에 실패했습니다.');
-                });
-            }
-        });
+document.addEventListener('DOMContentLoaded', function() {
+    // 수정 버튼 클릭 시 업체 수정 페이지로 이동
+    document.getElementById('updateButton').addEventListener('click', function() {
+        var bizRegNo = '<c:out value="${company.bizRegNo}" />';
+        window.location.href = "<c:url value='/admin/company/companyUpdateView' />?bizRegNo=" + bizRegNo;
     });
+
+    // 목록 버튼 클릭 시 목록 페이지로 이동
+    document.getElementById('listButton').addEventListener('click', function() {
+        window.location.href = "<c:url value='/admin/company/companyList' />";
+    });
+
+
+
+ // 삭제 버튼 클릭 시 AJAX 요청을 통해 업체 삭제
+    document.getElementById('deleteButton').addEventListener('click', function() {
+        if (confirm("정말 삭제하시겠습니까?")) {
+            var bizRegNo = '<c:out value="${company.bizRegNo}" />';
+            fetch('<c:url value="/admin/company/deleteCompany" />', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ bizRegNo: bizRegNo })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Response from server: ", data);  // 서버 응답 확인
+                if (data.status === true) {  // boolean 타입으로 status 체크
+                    alert('삭제가 완료되었습니다.');
+                    window.location.href = "<c:url value='/admin/company/companyList' />";
+                } else {
+                    alert('삭제에 실패했습니다: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('삭제 중 오류 발생:', error);
+                alert('삭제에 실패했습니다.');
+            });
+        }
+    });
+
+
+
+   
+});
+
+
+
+
+
 </script>
