@@ -30,6 +30,19 @@ public class ResponseHelper {
                 .status(true)
                 .build();
     }
+    // 성공 응답 (데이터 만)
+    public static <T> ResponseVO<T> successWithResult(T result) {
+        int count = 0;
+        if (result instanceof Collection) {
+            count = ((Collection<?>) result).size();
+        }
+        return ResponseVO.<T>builder()
+                .httpStatus(HttpStatus.OK)
+                .result(result)
+                .count(count)
+                .status(true)
+                .build();
+    }
 
     // 에러 응답
     public static <T> ResponseVO<T> error(String errorCode, String message, HttpStatus status, String debugMessage) {

@@ -42,7 +42,7 @@ public class AdminLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHand
                 .orElse("ROLE_UNKNOWN");
 
         // 로그인 이력 저장
-        loginService.saveLoginHistory(username, roleName, request, "SUCCESS", "");
+//        loginService.saveLoginHistory(username, roleName, request, "SUCCESS", "");
 
         // 기본 성공 핸들러 동작 유지
 //        super.onAuthenticationSuccess(request, response, authentication);

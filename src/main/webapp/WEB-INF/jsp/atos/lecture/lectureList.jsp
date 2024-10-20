@@ -35,7 +35,7 @@
 
         <table class="search-table">
             <tr>
-                 <th class="custom-th-width">신청시작/종료일
+                <th class="custom-th-width">신청시작/종료일</th>
                  <td colspan="2">
                     <div class="d-flex">
                         <span>시작일 :</span><input type="date" name="srcStartDate" id="startDate" class="form-control me-2 " value="${searchVO.srcStartDate }"/> 
@@ -72,8 +72,8 @@
         Total: <strong>${totalcount }건</strong>
     </div>
     <div>
-        <button class="btn-create-course" id="regist">과정개설</button>
-        <button class="btn-excel">EXCEL</button>
+        <button type="button" class="btn-create-course" id="regist">과정개설</button>
+        <button type="button" class="btn-excel">EXCEL</button>
     </div>
 </div>
 
