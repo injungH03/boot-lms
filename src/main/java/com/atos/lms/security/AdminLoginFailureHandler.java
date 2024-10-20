@@ -31,7 +31,7 @@ public class AdminLoginFailureHandler extends SimpleUrlAuthenticationFailureHand
             username = "UNKNOWN";
         }
 
-        loginService.saveLoginHistory(username, "UNKNOWN", request, "FAILURE", exception.getMessage());
+//        loginService.saveLoginHistory(username, "UNKNOWN", request, "FAILURE", exception.getMessage());
         request.getSession().setAttribute("errorMessage", "아이디 또는 비밀번호가 다릅니다.");
 
         response.sendRedirect("/admin/login?error=true");

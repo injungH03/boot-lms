@@ -11,6 +11,7 @@ import com.atos.lms.business.lecture.model.LectureVO;
 import com.atos.lms.common.utl.SortFieldValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -25,7 +26,7 @@ public class LectureService  {
         this.sortFieldValidator = sortFieldValidator;
     }
 
-
+	@Transactional
     public Map<String, Object> selectLecture(LectureVO lectureVO) {
 		Map<String, Object> map = new HashMap<String, Object>();
 
@@ -52,6 +53,7 @@ public class LectureService  {
 		return map;
 	}
 
+	@Transactional
 	public Map<String, Object> selectEducation(LectureVO lectureVO) {
 		Map<String, Object> map = new HashMap<String, Object>();
 
@@ -69,6 +71,7 @@ public class LectureService  {
 		return map;
 	}
 
+	@Transactional
 	public Map<String, Object> selectInstructor(LectureInsDTO lectureInsDTO) {
 		Map<String, Object> map = new HashMap<String, Object>();
 
@@ -78,6 +81,7 @@ public class LectureService  {
 		return map;
 	}
 
+	@Transactional
 	public String saveInstructor(LectureInsDTO lectureInsDTO) {
 
         String message = "";
@@ -96,6 +100,7 @@ public class LectureService  {
 		return message;
 	}
 
+	@Transactional
 	public String saveLecture(LectureVO lectureVO) {
 		String message = "";
 
@@ -114,14 +119,17 @@ public class LectureService  {
 		return message;
 	}
 
+	@Transactional
 	public LectureVO selectLectureKey(LectureVO lectureVO) {
 		return lectureDao.selectLectureKey(lectureVO);
 	}
 
+	@Transactional
 	public LectureVO selectLectureTitle(LectureEnrollDTO lectureEnrollDTO) {
 		return lectureDao.selectLectureOne(lectureEnrollDTO);
 	}
 
+	@Transactional
 	public String deleteLecture(LectureVO lectureVO) {
         String message = "";
 
@@ -132,6 +140,7 @@ public class LectureService  {
 		return message;
 	}
 
+	@Transactional
 	public Map<String, Object> selectEnrollList(LectureEnrollDTO lectureEnrollDTO) {
 		Map<String, Object> map = new HashMap<String, Object>();
 
@@ -150,6 +159,7 @@ public class LectureService  {
 		return map;
 	}
 
+	@Transactional
 	public Map<String, Object> selectStudentList(LectureMemDTO lectureMemDTO) {
 		Map<String, Object> map = new HashMap<String, Object>();
 
@@ -167,6 +177,7 @@ public class LectureService  {
 		return map;
 	}
 
+	@Transactional
 	public String deleteStudent(LectureMemDTO lectureMemDTO) {
 		String message = "";
 
@@ -176,6 +187,7 @@ public class LectureService  {
 		return message;
 	}
 
+	@Transactional
 	public String insertStudent(LectureMemDTO lectureMemDTO) {
 		String message = "";
 
@@ -189,6 +201,7 @@ public class LectureService  {
 		return message;
 	}
 
+	@Transactional
 	public String insertSelectedStudents(LectureMemDTO lectureMemDTO) {
 		String message = "";
 
@@ -206,6 +219,7 @@ public class LectureService  {
 		return message;
 	}
 
+	@Transactional
 	public String deleteSelectedStudents(LectureMemDTO lectureMemDTO) {
 		String message = "";
 

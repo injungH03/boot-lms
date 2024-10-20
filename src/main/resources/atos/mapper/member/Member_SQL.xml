@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atos.lms.business.member.service.MemberDAO">
+
+
+	<sql id="whereClause">
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="statusCode != null and statusCode != ''">
+				AND A.STATUS = #{statusCode}
+			</if>
+			<if test="corpBiz != null and corpBiz != ''">
+				AND C.BIZ_REG_NO = #{corpBiz}
+			</if>
+			<if test="searchCnd != null and searchCnd != ''">
+				<if test="searchCnd == 0">
+					AND A.ID LIKE CONCAT ('%', #{searchWrd},'%') 		
+				</if>
+				<if test="searchCnd == 1">
+					AND A.NAME LIKE CONCAT ('%', #{searchWrd},'%') 		
+				</if>
+			</if>
+			AND A.STATUS != '1005'	
+
+		</trim>
+	</sql>
+	
+	<select id="selectStatusCode" resultType="com.atos.lms.business.member.model.MemberVO">
+		SELECT
+			CODE AS statusCode, 
+			NAME AS statusName
+		FROM
+			ATOS_STATUS
+		WHERE CODE IN ('1001', '1002', '1003', '1004')
+	</select>
+	
+	<select id="selectCompany" resultType="com.atos.lms.business.member.model.MemberVO">
+		SELECT
+			BIZ_REG_NO AS corpBiz,
+			CORP_NAME AS corpName
+		FROM
+			ATOS_COMPANY
+	</select>
+
+	<select id="selectMemberList" resultType="com.atos.lms.business.member.model.MemberVO">
+		SELECT
+			A.ID, A.NAME, A.PHONE_NO,  A.STATUS, B.NAME AS LISTSTATUSNAME, C.BIZ_REG_NO, C.CORP_NAME
+		FROM
+			ATOS_MEMBER A
+		INNER JOIN ATOS_MEMBER_NOMAL N
+			ON A.ID = N.MEMBER_ID
+		INNER JOIN ATOS_COMPANY C
+			ON N.BIZ_REG_NO = C.BIZ_REG_NO
+		INNER JOIN ATOS_STATUS B
+			ON A.STATUS = B.CODE
+		<include refid="whereClause" />
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>	
+	
+	<select id="selectMemberListCnt" resultType="java.lang.Integer">
+		SELECT
+			COUNT(A.ID)
+		FROM
+			ATOS_MEMBER A
+		INNER JOIN ATOS_MEMBER_NOMAL N
+			ON A.ID = N.MEMBER_ID
+		INNER JOIN ATOS_COMPANY C
+			ON N.BIZ_REG_NO = C.BIZ_REG_NO
+		INNER JOIN ATOS_STATUS B
+			ON A.STATUS = B.CODE
+		<include refid="whereClause" />
+	</select>
+	
+	<select id="selectCompanyKey" resultType="com.atos.lms.business.company.model.CompanyVO">
+		SELECT 
+			BIZ_REG_NO, CORP_NAME, REP_NAME, BIZ_TYPE, BIZ_ITEM, PHONE_NO, ADDR1, ADDR2
+		FROM
+			ATOS_COMPANY
+		WHERE BIZ_REG_NO = #{corpBiz}
+	</select>
+	
+	<select id="selectMemberKey" resultType="com.atos.lms.business.member.model.MemberDTO">
+		SELECT 
+			  A.ID, A.NAME, A.BIRTHDATE, A.PHONE_NO, A.EMAIL, A.ZIPCODE
+			, A.ADDR1, A.ADDR2, B.BIZ_REG_NO, A.DEPARTMENT, A.POSITION
+			, B.CORP_NAME, B.REP_NAME, B.BIZ_TYPE, B.BIZ_ITEM 
+			, B.BIZ_REG_NO AS companybizRegNo
+			, B.PHONE_NO AS companyPhoneNo
+			, B.ZIPCODE AS companyZipcode
+			, B.ADDR1 AS companyAddr1
+			, B.ADDR2 AS companyAddr2
+		FROM
+			ATOS_MEMBER A
+		INNER JOIN ATOS_MEMBER_NOMAL N
+			ON A.ID = N.MEMBER_ID
+		INNER JOIN ATOS_COMPANY B
+			ON N.BIZ_REG_NO = B.BIZ_REG_NO
+		WHERE A.ID = #{id}
+	</select>
+	
+	<select id="selectMemberListExcel" resultType="com.atos.lms.business.member.model.MemberExcelVO">
+		SELECT 
+			  A.ID, A.NAME, A.BIRTHDATE, A.PHONE_NO, A.EMAIL, A.ZIPCODE
+			, A.ADDR1, A.ADDR2, C.BIZ_REG_NO, A.DEPARTMENT, A.POSITION
+			, C.CORP_NAME, C.REP_NAME, C.BIZ_TYPE, C.BIZ_ITEM
+			, C.BIZ_REG_NO AS companybizRegNo
+			, C.PHONE_NO AS companyPhoneNo
+			, C.ZIPCODE AS companyZipcode
+			, C.ADDR1 AS companyAddr1
+			, C.ADDR2 AS companyAddr2
+		FROM
+			ATOS_MEMBER A
+		INNER JOIN ATOS_MEMBER_NOMAL N
+			ON A.ID = N.MEMBER_ID
+		INNER JOIN ATOS_COMPANY C
+			ON N.BIZ_REG_NO = C.BIZ_REG_NO
+		INNER JOIN ATOS_STATUS B
+		ON A.STATUS = B.CODE
+		<include refid="whereClause" />
+	</select>
+	
+	<select id="checkEmailDuplicate" resultType="int">
+	    SELECT COUNT(1)
+	    FROM ATOS_MEMBER
+	    WHERE ID = #{email}
+	</select>
+	
+	<select id="checkDuplicateId" resultType="int">
+		SELECT COUNT(1)
+		FROM ATOS_MEMBER
+		WHERE ID = #{id}
+	</select>
+	
+	
+	<update id="updateStatus">
+		UPDATE ATOS_MEMBER
+		SET STATUS = #{status}
+		WHERE ID IN
+		<foreach item="id" collection="idlist" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</update>
+	
+
+	<insert id="insertMember">
+		INSERT INTO ATOS_MEMBER
+			(ID, PASSWORD, NAME, BIRTHDATE, PHONE_NO, ZIPCODE, ADDR1, ADDR2, EMAIL, STATUS, DEPARTMENT, POSITION)
+		VALUES
+			(#{id}, #{password}, #{name}, #{birthdate}, #{phoneNo}, #{zipcode}, #{addr1}, #{addr2}, #{email}, '1002', #{department}, #{position})
+	</insert>
+
+	<insert id="insertMemberNomal">
+		INSERT INTO ATOS_MEMBER_NOMAL
+			(MEMBER_ID, BIZ_REG_NO)
+		VALUES
+		    (#{id}, #{corpBiz})
+	</insert>
+	
+	<insert id="insertMemberList">
+	    INSERT INTO ATOS_MEMBER
+	    	(ID, PASSWORD, NAME, BIRTHDATE, PHONE_NO, EMAIL, STATUS, DEPARTMENT, POSITION)
+	    VALUES
+	    <foreach collection="memberList" item="member" separator=",">
+	        (#{member.id}, #{member.password}, #{member.name}, #{member.birthdate}, #{member.phoneNo}, #{member.email}, #{member.status}, #{member.department}, #{member.position})
+	    </foreach>
+	</insert>
+
+	<insert id="insertMemberNomalList">
+		INSERT INTO ATOS_MEMBER_NOMAL
+			(MEMBER_ID, BIZ_REG_NO)
+		VALUES
+		<foreach collection="memberList" item="member" separator=",">
+			(#{member.id},#{member.corpBiz})
+		</foreach>
+
+	</insert>
+	
+	<update id="updateMember">
+		UPDATE ATOS_MEMBER
+		SET 
+			  NAME = #{name}
+			, BIRTHDATE = #{birthdate}
+			, PHONE_NO = #{phoneNo}
+			, ZIPCODE = #{zipcode}
+			, ADDR1 = #{addr1}
+			, ADDR2 = #{addr2}
+			, EMAIL = #{email}
+			, DEPARTMENT = #{department}
+			, POSITION = #{position}
+		WHERE ID = #{id}
+	</update>
+	<update id="updateMemberNomal">
+		UPDATE ATOS_MEMBER_NOMAL
+		SET
+			BIZ_REG_NO = #{corpBiz}
+		WHERE MEMBER_ID = #{id}
+	</update>
+
+	<update id="deleteMember">
+		UPDATE ATOS_MEMBER
+		SET STATUS = '1005'
+		WHERE ID = #{id}
+	</update>
+
+	
+</mapper>
