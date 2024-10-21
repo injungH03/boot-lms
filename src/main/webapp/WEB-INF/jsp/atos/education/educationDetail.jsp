@@ -16,7 +16,7 @@
 <div class="wrap">
 
     <div class="head-section" style="margin-bottom:20px;">
-        <span>&nbsp;교육 상세 정보</span>
+        <span>&nbsp;교육 상세정보</span>
     </div>
 
 <div class="table-section">
