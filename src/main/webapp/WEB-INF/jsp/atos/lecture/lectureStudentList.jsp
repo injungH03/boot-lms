@@ -37,7 +37,7 @@
 				<th class="custom-th-width">과정날짜</th>
                 <td colspan="3">
                     <div class="d-flex">
-                        <input type="date" name="srcLearnDate" class="form-control me-2 " value="${searchVO.srcLearnDate }" />
+                        <input type="date" name="srcLearnDate" class="form-control me-2 widthAuto" value="${searchVO.srcLearnDate }" />
                     </div>
                 </td>
             <tr>
@@ -69,8 +69,8 @@
     </div>
     <div>
     	<button class="btn-create-course" id="studentAdd">수강생추가</button>
-        <button class="btn-excel">EXCEL</button>
         <button class="btn-del" id="allDelete">삭제</button>
+        <button class="btn-excel">EXCEL</button>
     </div>
 </div>
 
@@ -196,7 +196,7 @@ $(document).ready(function() {
 	    });
 	    
 	    if (selectedMemberIds.length === 0) {
-	        alert('삭제할 학생을 선택해주세요.');
+	        alert('삭제할 수강생을 선택해주세요.');
 	        return;
 	    }
 

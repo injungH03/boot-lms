@@ -68,11 +68,7 @@ public class MemberService {
 
 
     @Transactional
-    public String updateStatus(String ids, String status) {
-        
-        MemberVO memberVO = new MemberVO();
-        memberVO.setIdlist(Arrays.asList(ids.split(",")));
-        memberVO.setStatus(status);
+    public String updateStatus(MemberVO memberVO ) {
 
         memberDAO.updateStatus(memberVO);
 
@@ -111,14 +107,6 @@ public class MemberService {
         memberDAO.deleteMember(memberVO);
 
         return "회원 삭제 완료";
-    }
-
-    @Transactional
-    public String updateMember(MemberVO memberVO) {
-
-        memberDAO.updateMember(memberVO);
-
-        return "회원 수정 완료";
     }
 
     @Transactional
@@ -166,6 +154,59 @@ public class MemberService {
 
         return "회원 저장 성공";
     }
+
+    /** #########################################권한 강사 회원####################################################### */
+    public Map<String, Object> selectInstructorList(MemberVO memberVO) {
+        Map<String, Object> map = new HashMap<String, Object>();
+
+        map.put("resultList", memberDAO.selectInstructorList(memberVO));
+        map.put("resultCnt", memberDAO.selectInstructorListCnt(memberVO));
+
+        return map;
+    }
+
+    public MemberVO selectInstructorKey(MemberVO memberVO) {
+        return memberDAO.selectInstructorKey(memberVO);
+    }
+
+    public String saveInstructor(MemberVO memberVO) {
+
+        if ("U".equals(memberVO.getType())) {
+            memberDAO.updateMember(memberVO);
+            memberDAO.updateMemberInstructor(memberVO);
+            return "회원 수정 완료";
+        } else if ("C".equals(memberVO.getType())) {
+            memberDAO.insertMember(memberVO);
+            memberDAO.insertMemberInstructor(memberVO);
+            return "회원 등록 완료";
+        }
+
+        return "잘못된 경로";
+    }
+
+    public void instructorListExcelDown(HttpServletResponse response, MemberVO memberVO) throws Exception {
+        List<MemberVO> list = memberDAO.selectInstructorListExcel(memberVO);
+
+        Map<String, String> fieldToHeaderMap = new HashMap<>();
+        fieldToHeaderMap.put("id", "아이디");
+        fieldToHeaderMap.put("name", "이름");
+        fieldToHeaderMap.put("birthdate", "생년월일");
+        fieldToHeaderMap.put("phoneNo", "휴대폰번호");
+        fieldToHeaderMap.put("email", "이메일");
+        fieldToHeaderMap.put("zipcode", "우편번호");
+        fieldToHeaderMap.put("addr1", "주소1");
+        fieldToHeaderMap.put("addr2", "주소2");
+        fieldToHeaderMap.put("job", "직업");
+        fieldToHeaderMap.put("department", "소속");
+        fieldToHeaderMap.put("position", "직책");
+        fieldToHeaderMap.put("bios", "강사소개");
+        fieldToHeaderMap.put("career", "경력사항");
+
+        ExcelUtil.exportToExcel(response, list, "강사목록", "강사목록엑셀파일", fieldToHeaderMap);
+
+    }
+
+    /**#################################################################################################################### */
 
     public void sampleExcelDown(HttpServletResponse response) throws Exception {
         Map<String, String> fieldToHeaderMap = new LinkedHashMap<>();

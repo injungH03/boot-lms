@@ -4,10 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.atos.lms.business.lecture.model.LectureEnrollDTO;
-import com.atos.lms.business.lecture.model.LectureInsDTO;
-import com.atos.lms.business.lecture.model.LectureMemDTO;
-import com.atos.lms.business.lecture.model.LectureVO;
+import com.atos.lms.business.lecture.model.*;
 import com.atos.lms.common.utl.SortFieldValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -125,8 +122,13 @@ public class LectureService  {
 	}
 
 	@Transactional
-	public LectureVO selectLectureTitle(LectureEnrollDTO lectureEnrollDTO) {
-		return lectureDao.selectLectureOne(lectureEnrollDTO);
+	public LectureVO selectLectureTitle(int lectureCode) {
+		return lectureDao.selectLectureOne(lectureCode);
+	}
+
+	@Transactional
+	public LectureVO selectLectureAttendTime(int lectureCode) {
+		return lectureDao.selectLectureOne(lectureCode);
 	}
 
 	@Transactional
@@ -154,7 +156,7 @@ public class LectureService  {
 
 		map.put("resultList", lectureDao.selectEnrollList(lectureEnrollDTO));
 		map.put("resultCnt", lectureDao.selectEnrollListCnt(lectureEnrollDTO));
-		map.put("capacity", lectureDao.selectLectureCapacity(lectureEnrollDTO));
+		map.put("capacity", lectureDao.selectLectureCapacity(lectureEnrollDTO.getLectureCode()));
 
 		return map;
 	}
@@ -178,6 +180,22 @@ public class LectureService  {
 	}
 
 	@Transactional
+	public Map<String, Object> selectAttendList(LectureAttendDTO lectureAttendDTO) {
+		Map<String, Object> map = new HashMap<String, Object>();
+
+		String validateField = sortFieldValidator.validateSortField("lectureAttend", lectureAttendDTO.getSortField());
+		String validateOrder = sortFieldValidator.validateSortOrder(lectureAttendDTO.getSortOrder());
+
+		lectureAttendDTO.setSortField(validateField);
+		lectureAttendDTO.setSortOrder(validateOrder);
+
+		map.put("resultList", lectureDao.selectAttendList(lectureAttendDTO));
+		map.put("resultCnt", lectureDao.selectAttendListCnt(lectureAttendDTO));
+
+		return map;
+	}
+
+	@Transactional
 	public String deleteStudent(LectureMemDTO lectureMemDTO) {
 		String message = "";
 
@@ -191,12 +209,23 @@ public class LectureService  {
 	public String insertStudent(LectureMemDTO lectureMemDTO) {
 		String message = "";
 
-	    lectureDao.insertStudent(lectureMemDTO);
+		LectureVO lectureVO =  lectureDao.selectLectureCapacity(lectureMemDTO.getLectureCode());
 
-		lectureDao.insertAttendance(lectureMemDTO);
-		lectureDao.insertCertification(lectureMemDTO);
+		if (lectureVO.getEnrolled() >= lectureVO.getCapacity()) {
+			message = "수강생 정원 초과 입니다.";
 
-        message = "수강생 배정 완료";
+		} else {
+			lectureDao.insertStudent(lectureMemDTO);
+			lectureDao.insertAttendance(lectureMemDTO);
+			lectureDao.insertCertification(lectureMemDTO);
+
+			int resultNum = lectureVO.getEnrolled() + 1;
+			lectureMemDTO.setEnrolled(resultNum);
+
+			lectureDao.updateLectureEnroll(lectureMemDTO);
+
+			message = "수강생 배정 완료";
+		}
 
 		return message;
 	}
@@ -205,17 +234,37 @@ public class LectureService  {
 	public String insertSelectedStudents(LectureMemDTO lectureMemDTO) {
 		String message = "";
 
-		lectureDao.insertStudentBatch(lectureMemDTO);
+		LectureVO lectureVO =  lectureDao.selectLectureCapacity(lectureMemDTO.getLectureCode());
 
-	    List<Integer> enrollIds = lectureDao.selectEnrollIds(lectureMemDTO);
+		// 선택된 수강생 인원
+		int count = lectureMemDTO.getMemberIds().size();
+		// 수강생 정원
+		int capacity = lectureVO.getCapacity();
+		// 현재 수강 인원
+		int enrollCount = lectureVO.getEnrolled();
+		// 남은 수강 정원 수
+		int num = capacity - enrollCount;
 
-	    lectureMemDTO.setEnrollIds(enrollIds);
+		if (count > num) {
+			message = "정원 초과 입니다. 남은 수강 정원 = " + num + " 선택한 인원 수 = " + count;
+		} else {
+			lectureDao.insertStudentBatch(lectureMemDTO);
 
-		lectureDao.insertAttendanceBatch(lectureMemDTO);
-		lectureDao.insertCertificationBatch(lectureMemDTO);
+			List<Integer> enrollIds = lectureDao.selectEnrollIds(lectureMemDTO);
 
-        message = "선택 수강생 배정 완료";
+			lectureMemDTO.setEnrollIds(enrollIds);
 
+			lectureDao.insertAttendanceBatch(lectureMemDTO);
+			lectureDao.insertCertificationBatch(lectureMemDTO);
+
+			//수강 인원 추가
+			int resultNum = count + enrollCount;
+
+			lectureMemDTO.setEnrolled(resultNum);
+			lectureDao.updateLectureEnroll(lectureMemDTO);
+
+			message = "선택 수강생 배정 완료";
+		}
 		return message;
 	}
 
@@ -227,6 +276,40 @@ public class LectureService  {
 		message = "선택 수강생 배정 취소 완료";
 
 		return message;
+	}
+
+	@Transactional
+	public String attendSave(LectureAttendDTO lectureAttendDTO) {
+
+		if ("S".equals(lectureAttendDTO.getType())) {
+			// 출석
+			lectureAttendDTO.setStatus("출석");
+			lectureDao.updateAttend(lectureAttendDTO);
+
+			return "출석 완료";
+
+		} else if ("F".equals(lectureAttendDTO.getType())) {
+			// 결석
+			lectureAttendDTO.setStatus("결석");
+			lectureAttendDTO.setInTime(null);
+			lectureAttendDTO.setOutTime(null);
+			lectureDao.updateAttend(lectureAttendDTO);
+
+			return "결석 완료";
+
+		} else if ("A".equals(lectureAttendDTO.getType())) {
+			// 선택 출석
+			LectureVO lectureVO = lectureDao.selectLectureOne(lectureAttendDTO.getLectureCode());
+			lectureAttendDTO.setStatus("출석");
+			lectureAttendDTO.setInTime(lectureVO.getStartTime());
+			lectureAttendDTO.setOutTime(lectureVO.getEndTime());
+			lectureDao.updateAttendAll(lectureAttendDTO);
+
+			return "선택 출석 완료";
+		}
+
+
+		return "접근 오류";
 	}
 
 

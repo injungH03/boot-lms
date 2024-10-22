@@ -47,5 +47,19 @@ public interface MemberDAO {
 
     void deleteMember(MemberVO memberVO);
 
+    /** ##########################권한 강사 회원############################ */
+
+    List<MemberVO> selectInstructorList(MemberVO memberVO);
+
+    int selectInstructorListCnt(MemberVO memberVO);
+
+    List<MemberVO> selectInstructorListExcel(MemberVO memberVO);
+
+    MemberVO selectInstructorKey(MemberVO memberVO);
+
+    void insertMemberInstructor(MemberVO memberVO);
+
+    void updateMemberInstructor(MemberVO memberVO);
+
 
 }

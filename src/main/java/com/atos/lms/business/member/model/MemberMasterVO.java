@@ -18,4 +18,8 @@ public class MemberMasterVO extends MasterVO {
 
     private String corpBiz;      // 사업자 번호
     private String corpName;     // 사업자 이름
+
+    private String job;
+    private String bios;
+    private String career;
 }
