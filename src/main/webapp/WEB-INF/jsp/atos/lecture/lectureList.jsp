@@ -38,8 +38,8 @@
                 <th class="custom-th-width">신청시작/종료일</th>
                  <td colspan="2">
                     <div class="d-flex">
-                        <span>시작일 :</span><input type="date" name="srcStartDate" id="startDate" class="form-control me-2 " value="${searchVO.srcStartDate }"/> 
-						<span class="span-ml">종료일 :</span><input type="date" name="srcEndDate" id="endDate" class="form-control me-2 " value="${searchVO.srcEndDate }"/>
+                        <span>시작일 :</span><input type="date" name="srcStartDate" id="startDate" class="form-control me-2 custom-width" value="${searchVO.srcStartDate }"/>
+						<span class="span-ml">종료일 :</span><input type="date" name="srcEndDate" id="endDate" class="form-control me-2 custom-width" value="${searchVO.srcEndDate }"/>
                     </div>
                 </td>
                 <th class="custom-th-width">과정날짜</th>

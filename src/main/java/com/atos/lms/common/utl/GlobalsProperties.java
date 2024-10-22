@@ -38,6 +38,14 @@ public class GlobalsProperties {
     @Value("${local.react.url}")
     private String localReactUrl;
 
+    @Value("${Globals.local.dev}")
+    private String localDev;
+
+    @Value("${Globals.local.op}")
+    private String operate;
+
+
+
     // Getter methods
     public String getFileUploadImageExtensions() {
         return fileUploadImageExtensions;
@@ -69,5 +77,13 @@ public class GlobalsProperties {
 
     public String getLocalReactUrl() {
         return localReactUrl;
+    }
+
+    public String getLocalDev() {
+        return localDev;
+    }
+
+    public String getOperate() {
+        return operate;
     }
 }

@@ -10,7 +10,7 @@
 <div class="wrap">
 
 <div class="head-section">
-	<span>회원 상세</span>
+	<span>강사 상세</span>
 </div>
 <div class="table-section">
 	<table class="search-table detail-table">
@@ -39,8 +39,8 @@
 		<tr>
 			<th>이메일</th>
 			<td><c:out value="${member.email }" /></td>
-			<th>소속기업</th>
-			<td><c:out value="${member.corpName }" /></td>
+			<th>직업</th>
+			<td><c:out value="${member.job }" /></td>
 		</tr>
 		<tr>
 			<th>소속부서</th>
@@ -49,26 +49,12 @@
 			<td><c:out value="${member.position }" /></td>
 		</tr>
 		<tr>
-			<th>사업자등록번호</th>
-			<td><c:out value="${member.companybizRegNo }" /></td>
-			<th>대표전화번호</th>
-			<td><c:out value="${member.companyPhoneNo }" /></td>
+		    <th>강사소개</th>
+		    <td colspan="3"><c:out value="${member.bios }" /></td>
 		</tr>
 		<tr>
-			<th>사업장명</th>
-			<td><c:out value="${member.corpName }" /></td>
-			<th>대표자명</th>
-			<td><c:out value="${member.repName }" /></td>
-		</tr>
-		<tr>
-			<th>업태</th>
-			<td><c:out value="${member.bizType }" /></td>
-			<th>종목</th>
-			<td><c:out value="${member.bizItem }" /></td>
-		</tr>
-		<tr>
-			<th>사업장주소</th>
-			<td colspan="3"><c:out value="${member.companyAddr1 }" />&nbsp;<c:out value="${member.companyAddr2 }" /></td>
+		    <th>경력사항</th>
+		    <td colspan="3"><c:out value="${member.career }" /></td>
 		</tr>
 	</table>
 
@@ -85,12 +71,12 @@
 $(document).ready(function() {
 	$('#Updt').on('click', function() {
 		const memId = '<c:out value="${member.id }" />';
-		window.location.href = "<c:url value='/admin/member/memberUpdateView' />?id=" + memId;
+		window.location.href = "<c:url value='/admin/member/instructorUpdateView' />?id=" + memId;
 		
 	});
 	$('#list').on('click', function() {
 		const pageIndex = $('input[name=pageIndex]').val();
-		window.location.href = "<c:url value='/admin/member/memberList'/>?pageIndex=" + pageIndex;
+		window.location.href = "<c:url value='/admin/member/instructorList'/>?pageIndex=" + pageIndex;
 		
 	});
 	
@@ -108,7 +94,7 @@ $(document).ready(function() {
 	            },
 	            success: function(response) {
 	                alert(response.message);
-	                window.location.href = "<c:url value='/admin/member/memberList'/>?pageIndex=" + pageIndex;
+	                window.location.href = "<c:url value='/admin/member/instructorList'/>?pageIndex=" + pageIndex;
 	            },
 	            error: function(error) {
 	                console.error('오류 발생:', error);

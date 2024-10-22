@@ -202,5 +202,72 @@
 		WHERE ID = #{id}
 	</update>
 
+<!-- ################################권한 강사 회원###########################################	-->
+
+	<select id="selectInstructorList" resultType="com.atos.lms.business.member.model.MemberVO">
+		SELECT
+			A.ID, A.NAME, A.PHONE_NO, A.STATUS, A.DEPARTMENT, A.POSITION, I.JOB,
+			B.NAME AS listStatusName
+		FROM
+			ATOS_MEMBER A
+		INNER JOIN ATOS_STATUS B
+			ON A.STATUS = B.CODE
+		INNER JOIN ATOS_MEMBER_INSTRUCTOR I
+			ON A.ID = I.INSTRUCTOR
+		<include refid="whereClause" />
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
 	
+	<select id="selectInstructorListCnt" resultType="java.lang.Integer">
+		SELECT
+			COUNT(ID)
+		FROM
+			ATOS_MEMBER A
+		INNER JOIN ATOS_STATUS B
+			ON A.STATUS = B.CODE
+		INNER JOIN ATOS_MEMBER_INSTRUCTOR I
+			ON A.ID = I.INSTRUCTOR
+		<include refid="whereClause" />
+	</select>
+
+	<select id="selectInstructorListExcel">
+		SELECT
+		A.ID, A.NAME, A.BIRTHDATE, A.PHONE_NO, A.EMAIL, A.ZIPCODE
+		, A.ADDR1, A.ADDR2, I.JOB, A.DEPARTMENT, A.POSITION, I.BIOS, I.CAREER
+		FROM
+			ATOS_MEMBER A
+		INNER JOIN ATOS_STATUS B
+			ON A.STATUS = B.CODE
+		INNER JOIN ATOS_MEMBER_INSTRUCTOR I
+			ON A.ID = I.INSTRUCTOR
+		<include refid="whereClause" />
+	</select>
+
+	<select id="selectInstructorKey">
+		SELECT
+		A.ID, A.NAME, A.BIRTHDATE, A.PHONE_NO, A.EMAIL, A.ZIPCODE
+		, A.ADDR1, A.ADDR2, I.JOB, A.DEPARTMENT, A.POSITION, I.BIOS, I.CAREER
+		FROM
+			ATOS_MEMBER A
+		INNER JOIN ATOS_MEMBER_INSTRUCTOR I
+			ON A.ID = I.INSTRUCTOR
+		WHERE A.ID = #{id}
+	</select>
+
+	<insert id="insertMemberInstructor">
+		INSERT INTO ATOS_MEMBER_INSTRUCTOR
+			(INSTRUCTOR, JOB, BIOS, CAREER)
+		VALUES
+			(#{id}, #{job}, #{bios}, #{career})
+	</insert>
+	
+	<update id="updateMemberInstructor">
+		UPDATE ATOS_MEMBER_INSTRUCTOR
+		SET
+			JOB = #{job},
+			BIOS = #{bios},
+			CAREER = #{career}
+		WHERE ID = #{id}
+	</update>
+
 </mapper>

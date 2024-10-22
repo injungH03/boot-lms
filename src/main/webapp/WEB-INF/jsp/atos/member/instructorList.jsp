@@ -10,27 +10,16 @@
 <div class="wrap">
 
 <div class="head-section">
-	<span>&nbsp;회원 목록</span>
+	<span>&nbsp;강사 목록</span>
 </div>
 
-<form id="searchForm" name="searchForm" action="<c:url value='/admin/member/memberList'/>" method="get">
+<form id="searchForm" name="searchForm" action="<c:url value='/admin/member/instructorList'/>" method="get">
 <input type="hidden" name="pageIndex" value="${searchVO.pageIndex}">
 
 <div class="table-section">
 
         <table class="search-table">
             <tr>
-                <th class="custom-th-width">업체</th>
-                 <td>
-                     <select id="group" name="corpBiz" class="form-select">
-                         <option value="">선택</option>
-                         <c:forEach var="company" items="${company }">
-                             <option value="${company.corpBiz }" <c:if test="${company.corpBiz == searchVO.corpBiz}">selected</c:if>>
-                                     ${company.corpName }
-                             </option>
-                         </c:forEach>
-                     </select>
-                </td>
                 <th class="custom-th-width">상태</th>
                 <td>
                     <select id="status" name="statusCode" class="form-select">
@@ -67,7 +56,6 @@
     </div>
     <div>
         <button type="button" class="btn-create-course" id="statusUpdate">상태변경</button>
-        <button type="button" class="btn-create-course" id="AllRegist">일괄등록</button>
         <button type="button" class="btn-create-course" id="regist">등록</button>
         <button type="button" class="btn-excel" id="excelDown">EXCEL</button>
     </div>
@@ -76,33 +64,39 @@
 <div class="course-table-section">
     <table class="table table-bordered table-hover" id="memberTable">
         <colgroup>
-            <col style="width: 5%;">
-            <col style="width: 20%;">
-            <col style="width: 10%;">
-            <col style="width: 15%;">
-            <col style="width: 10%;">
-            <col style="width: 10%;">
-            <col style="width: 5%;">
+	        <col style="width: 5%;">
+	        <col style="width: 15%;">
+	        <col style="width: 10%;">
+	        <col style="width: 15%;">
+	        <col style="width: 10%;">
+	        <col style="width: 10%;">
+	        <col style="width: 10%;">
+	        <col style="width: 10%;">
+	        <col style="width: 5%;">
         </colgroup>
         <thead>
             <tr>
-                <th>No</th>
+                <th>번호</th>
                 <th class="board_th_link">아이디</th>
                 <th>이름</th>
                 <th>전화번호</th>
                 <th>소속</th>
+                <th>직책</th>
+                <th>직업</th>
                 <th>상태</th>
                 <th><input type="checkbox" id="checkAll"></th>
             </tr>
         </thead>
         <tbody>
         <c:forEach items="${resultList }" var="resultInfo" varStatus="status">
-            <tr >
+            <tr>
                 <td><c:out value="${(searchVO.pageIndex-1) * searchVO.pageSize + status.index + 1}"/></td>
-                <td class="left"><a href="<c:url value='/admin/member/memberDetail' />?id=${resultInfo.id }&pageIndex=${searchVO.pageIndex}"><c:out value="${resultInfo.id }" /></a></td>
+                <td class="left"><a href="<c:url value='/admin/member/instructorDetail' />?id=${resultInfo.id }&pageIndex=${searchVO.pageIndex}"><c:out value="${resultInfo.id }" /></a></td>
                 <td><c:out value="${resultInfo.name }" /></td>
                 <td><c:out value="${resultInfo.phoneNo }" /></td>
-                <td><c:out value="${resultInfo.corpName }" /></td>
+                <td><c:out value="${resultInfo.department }" /></td>
+                <td><c:out value="${resultInfo.position }" /></td>
+                <td><c:out value="${resultInfo.job }" /></td>
                 <td><c:out value="${resultInfo.listStatusName }" /></td>
                 <td><input type="checkbox" name="rowCheck" value="${resultInfo.id }"></td>
             </tr>
@@ -110,7 +104,7 @@
 
         <c:if test="${fn:length(resultList) == 0}">
 	        <tr>
-	            <td colspan="7">조회된 결과가 존재하지 않습니다.</td>
+	            <td colspan="9">조회된 결과가 존재하지 않습니다.</td>
 	        </tr>
         </c:if>
 
@@ -166,15 +160,7 @@ $(document).ready(function() {
 
     //등록 이동
     $('#regist').on('click', function() {
-        window.location.href = "<c:url value='/admin/member/memberRegistView'/>";
-    });
-    //일괄 등록 이동
-    $('#AllRegist').on('click', function() {
-        window.location.href = "<c:url value='/admin/member/memberAllRegistView'/>";
-    });
-    // 업체 셀렉트 박스 변경 시
-    $('#group').change(function() {
-        $('#searchForm').submit();
+        window.location.href = "<c:url value='/admin/member/instructorRegistView'/>";
     });
 
     // 상태 셀렉트 박스 변경 시
@@ -241,7 +227,7 @@ $(document).ready(function() {
         const searchForm = $('#searchForm');
         const originalAction = searchForm.attr('action');
 
-        searchForm.attr('action', '/admin/member/memberListExcelDown');
+        searchForm.attr('action', '/admin/member/instructorListExcelDown');
 
         searchForm.submit();
 

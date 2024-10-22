@@ -3,10 +3,7 @@ package com.atos.lms.business.lecture.service;
 
 import java.util.List;
 
-import com.atos.lms.business.lecture.model.LectureEnrollDTO;
-import com.atos.lms.business.lecture.model.LectureInsDTO;
-import com.atos.lms.business.lecture.model.LectureMemDTO;
-import com.atos.lms.business.lecture.model.LectureVO;
+import com.atos.lms.business.lecture.model.*;
 import org.apache.ibatis.annotations.Mapper;
 
 
@@ -30,11 +27,17 @@ public interface LectureDAO  {
 
 	LectureVO selectLectureKey(LectureVO lectureVO);
 
-	LectureVO selectLectureOne(LectureEnrollDTO lectureEnrollDTO);
+	LectureVO selectLectureOne(int lectureCode);
+
+	LectureVO selectAttendTime(LectureAttendDTO lectureAttendDTO );
 
 	List<LectureMemDTO> selectStudentList(LectureMemDTO lectureMemDTO);
 
 	int selectStudentListCnt(LectureMemDTO lectureMemDTO);
+
+	List<LectureAttendDTO> selectAttendList(LectureAttendDTO lectureAttendDTO);
+
+	int selectAttendListCnt(LectureAttendDTO lectureAttendDTO);
 
 	List<LectureMemDTO> selectCompanyList();
 
@@ -42,7 +45,10 @@ public interface LectureDAO  {
 
 	void updateLecture(LectureVO lectureVO);
 
-	/** 강의에 강사 업데이트*/
+	/** 강의에 수강생 배정 인원수 업데이트 */
+	void updateLectureEnroll(LectureMemDTO lectureMemDTO);
+
+	/** 강의에 강사 업데이트 */
 	void updateLectureInstructor(LectureInsDTO lectureInsDTO);
 
 	/** 강사 배정 */
@@ -76,7 +82,7 @@ public interface LectureDAO  {
 	List<Integer> selectEnrollIds(LectureMemDTO lectureMemDTO);
 
 	/** 수강생 정원 조회 */
-	LectureVO selectLectureCapacity(LectureEnrollDTO lectureEnrollDTO);
+	LectureVO selectLectureCapacity(int lectureCode);
 
 	/** 배정된 수강생 *선택* 배정 취소  (삭제) */
 	void deleteStudentBatch(LectureMemDTO lectureMemDTO);
@@ -87,4 +93,8 @@ public interface LectureDAO  {
 
 	void insertCertificationBatch(LectureMemDTO lectureMemDTO);
 
+	/** 출석 / 결석 처리 */
+	void updateAttend(LectureAttendDTO lectureAttendDTO);
+
+	void updateAttendAll(LectureAttendDTO lectureAttendDTO);
 }

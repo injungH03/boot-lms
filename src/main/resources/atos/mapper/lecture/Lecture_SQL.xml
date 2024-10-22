@@ -112,7 +112,7 @@
 		</where>
 	</sql>
 
-		<sql id="whereStudent">
+	<sql id="whereStudent">
 		<where>
 			<if test="bizRegNo != null and bizRegNo !=''">
 				AND C.BIZ_REG_NO = #{bizRegNo}
@@ -134,6 +134,24 @@
 			    WHERE E.MEMBER_ID = S.ID
 			    AND E.LECTURE_ID = #{lectureCode}
 			)
+		</where>
+	</sql>
+
+	<sql id="whereAttend">
+		<where>
+			<if test="lectureCode > 0">
+				AND E.LECTURE_ID = #{lectureCode}
+			</if>
+			<if test="searchCnd != null and searchCnd != ''">
+				<choose>
+					<when test="searchCnd == 0">
+						AND E.MEMBER_ID LIKE CONCAT ('%', #{searchWrd},'%')
+					</when>
+					<when test="searchCnd == 1">
+						AND M.NAME LIKE CONCAT ('%', #{searchWrd},'%')
+					</when>
+				</choose>
+			</if>
 		</where>
 	</sql>
 
@@ -310,6 +328,52 @@
 		<include refid="whereStudent" />
 	</select>
 
+	<select id="selectAttendList" resultType="com.atos.lms.business.lecture.model.LectureAttendDTO">
+		SELECT
+			A.ATTEND_CODE, A.ENROLL_ID, A.IN_TIME , A.OUT_TIME , A.ATTEND_DATE , A.STATUS , E.MEMBER_ID, E.LECTURE_ID, M.NAME, C.CORP_NAME,
+			CONCAT(
+				CASE
+				WHEN TIME_FORMAT(A.IN_TIME, '%p') = 'AM' THEN '오전 '
+				ELSE '오후 '
+				END,
+				TIME_FORMAT(A.IN_TIME, '%h:%i')
+			) AS inTimeFormat,
+			CONCAT(
+				CASE
+				WHEN TIME_FORMAT(A.OUT_TIME, '%p') = 'AM' THEN '오전 '
+				ELSE '오후 '
+				END,
+				TIME_FORMAT(A.OUT_TIME, '%h:%i')
+			) AS outTimeFormat
+		FROM ATOS_ATTENDANCE A
+		INNER JOIN ATOS_ENROLLMENT E
+			ON E.ENROLL_CODE = A.ENROLL_ID
+		INNER JOIN ATOS_MEMBER M
+			ON E.MEMBER_ID = M.ID
+		INNER JOIN ATOS_MEMBER_NOMAL N
+			ON M.ID = N.MEMBER_ID
+		INNER JOIN ATOS_COMPANY C
+			ON N.BIZ_REG_NO = C.BIZ_REG_NO
+		<include refid="whereAttend" />
+		<include refid="orderBy" />
+		LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+
+	<select id="selectAttendListCnt" resultType="java.lang.Integer">
+		SELECT
+			COUNT(A.ATTEND_CODE)
+		FROM ATOS_ATTENDANCE A
+		INNER JOIN ATOS_ENROLLMENT E
+			ON E.ENROLL_CODE = A.ENROLL_ID
+		INNER JOIN ATOS_MEMBER M
+			ON E.MEMBER_ID = M.ID
+		INNER JOIN ATOS_MEMBER_NOMAL N
+			ON M.ID = N.MEMBER_ID
+		INNER JOIN ATOS_COMPANY C
+			ON N.BIZ_REG_NO = C.BIZ_REG_NO
+		<include refid="whereAttend" />
+	</select>
+
 
 	<select id="selectLectureKey" resultType="com.atos.lms.business.lecture.model.LectureVO">
 		SELECT
@@ -351,14 +415,14 @@
 	</select>
 
 	<select id="selectLectureCapacity" resultType="com.atos.lms.business.lecture.model.LectureVO">
-		SELECT CAPACITY
+		SELECT CAPACITY, ENROLLED
 		FROM ATOS_LECTURE
 		WHERE LECTURE_CODE = #{lectureCode}
 	</select>
 
 	<select id="selectLectureOne" resultType="com.atos.lms.business.lecture.model.LectureVO">
 		SELECT
-			L.LECTURE_CODE, E.TITLE
+			L.LECTURE_CODE, E.TITLE, L.START_TIME, L.END_TIME
 		FROM ATOS_LECTURE L
 		INNER JOIN ATOS_EDUCATION E
 			ON L.EDUCATION = E.EDU_CODE
@@ -487,6 +551,13 @@
 	    </foreach>
 	</insert>
 
+	<update id="updateLectureEnroll">
+		UPDATE ATOS_LECTURE
+		SET
+			ENROLLED = #{enrolled}
+		WHERE LECTURE_CODE = #{lectureCode}
+
+	</update>
 
 	<update id="updateInstructor">
 		UPDATE ATOS_INSTRUCTOR_ASSIGNMENTS
@@ -494,6 +565,31 @@
 			INSTRUCTOR = #{id}
 		WHERE LECTURE_CODE = #{lectureCode}
 	</update>
+
+	<update id="updateAttend">
+		UPDATE ATOS_ATTENDANCE
+		SET
+			IN_TIME = #{inTime},
+			OUT_TIME = #{outTime},
+			ATTEND_DATE = NOW(),
+			STATUS = #{status}
+		WHERE ATTEND_CODE = #{attendCode}
+	</update>
+
+	<update id="updateAttendAll">
+		UPDATE ATOS_ATTENDANCE
+		SET
+			IN_TIME = #{inTime},
+			OUT_TIME = #{outTime},
+			ATTEND_DATE = NOW(),
+			STATUS = #{status}
+		WHERE ATTEND_CODE IN
+		<foreach item="attend" collection="attendCodeList" open="(" separator="," close=")">
+			#{attend}
+		</foreach>
+
+	</update>
+
 
 	<delete id="deleteInstructor">
 		DELETE FROM ATOS_INSTRUCTOR_ASSIGNMENTS

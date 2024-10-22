@@ -5,10 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 
-import com.atos.lms.business.lecture.model.LectureEnrollDTO;
-import com.atos.lms.business.lecture.model.LectureInsDTO;
-import com.atos.lms.business.lecture.model.LectureMemDTO;
-import com.atos.lms.business.lecture.model.LectureVO;
+import com.atos.lms.business.lecture.model.*;
 import com.atos.lms.business.lecture.service.LectureService;
 import com.atos.lms.business.member.model.MemberVO;
 import com.atos.lms.common.model.CategoryVO;
@@ -126,7 +123,7 @@ public class LectureController {
 	@RequestMapping("/lectureStudentList")
 	public String lectureStudentList(@ModelAttribute("searchVO") LectureEnrollDTO lectureEnrollDTO, ModelMap model) throws Exception {
 
-		LectureVO lecture = lectureService.selectLectureTitle(lectureEnrollDTO);
+		LectureVO lecture = lectureService.selectLectureTitle(lectureEnrollDTO.getLectureCode());
 
 		System.out.println(">>>>lecture " + lecture);
 
@@ -160,12 +157,29 @@ public class LectureController {
 	}
 
 	@RequestMapping("/lectureAttendance")
-	public String attendanceInfo(@ModelAttribute("searchVO") LectureEnrollDTO lectureEnrollDTO, ModelMap model) throws Exception {
+	public String attendanceInfo(@ModelAttribute("searchVO")LectureAttendDTO lectureAttendDTO, ModelMap model) throws Exception {
 
-		LectureVO lecture = lectureService.selectLectureTitle(lectureEnrollDTO);
+		LectureVO lecture = lectureService.selectLectureTitle(lectureAttendDTO.getLectureCode());
 
+		PaginationInfo paginationInfo = new PaginationInfo();
 
+		paginationInfo.setCurrentPageNo(lectureAttendDTO.getPageIndex());
+		paginationInfo.setRecordCountPerPage(lectureAttendDTO.getPageUnit());
+		paginationInfo.setPageSize(lectureAttendDTO.getPageSize());
 
+		lectureAttendDTO.setFirstIndex(paginationInfo.getFirstRecordIndex());
+		lectureAttendDTO.setLastIndex(paginationInfo.getLastRecordIndex());
+		lectureAttendDTO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
+
+		Map<String, Object> map = lectureService.selectAttendList(lectureAttendDTO);
+
+		int totalcount = Integer.parseInt(String.valueOf(map.get("resultCnt")));
+
+		paginationInfo.setTotalRecordCount(totalcount);
+
+		model.addAttribute("paginationInfo", paginationInfo);
+		model.addAttribute("totalcount", totalcount);
+		model.addAttribute("resultList", map.get("resultList"));
 		model.addAttribute("result", lecture);
 		model.addAttribute("page", "lectureAttendance");
 
@@ -300,6 +314,28 @@ public class LectureController {
         ResponseVO<Void> response = ResponseHelper.success(message);
 
         return new ResponseEntity<>(response, response.getHttpStatus());
+	}
+
+	@RequestMapping("/attendTime")
+	@ResponseBody
+	public ResponseEntity<ResponseVO<LectureVO>> attendTime(@RequestBody LectureAttendDTO lectureAttendDTO) throws Exception {
+
+		LectureVO lectureVO = lectureService.selectLectureAttendTime(lectureAttendDTO.getLectureCode());
+
+		ResponseVO<LectureVO> response = ResponseHelper.successWithResult(lectureVO);
+
+		return new ResponseEntity<>(response, response.getHttpStatus());
+	}
+
+	@RequestMapping("/attendSave")
+	@ResponseBody
+	public ResponseEntity<ResponseVO<Void>> attendSave(@RequestBody LectureAttendDTO lectureAttendDTO) throws Exception {
+
+		String message = lectureService.attendSave(lectureAttendDTO);
+
+		ResponseVO<Void> response = ResponseHelper.success(message);
+
+		return new ResponseEntity<>(response, response.getHttpStatus());
 	}
 
 	@RequestMapping("/addSelectedStudents")

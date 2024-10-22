@@ -11,7 +11,7 @@
 <div class="wrap">
 
 <div class="head-section">
-	<span>&nbsp;회원 등록</span>
+	<span>&nbsp;회원수정</span>
 </div>
 <div class="table-section">
 
@@ -19,9 +19,7 @@
         <table class="search-table regist-table">
             <tr>
                 <th>아이디</th>
-                <td colspan="3">
-                    <input type="text" name="id" id="userId" class="form-control me-2 widthAuto" />
-                </td>
+                <td colspan="3"><input type="text" name="id" value="${member.id }" class="form-control me-2 widthAuto"  readonly /></td>
             </tr>
             <tr>
                 <th>비밀번호</th>
@@ -33,69 +31,53 @@
             </tr>
             <tr>
                 <th>이름</th>
-                <td><input type="text" name="name"  class="form-control me-2 widthAuto"/></td>
+                <td><input type="text" name="name" value="${member.name }" class="form-control me-2 widthAuto"/></td>
                 <th>생년월일</th>
-                <td><input type="date" name="birthdate"  class="form-control me-2 widthAuto" /></td>
+                <td><input type="date" name="birthdate" value="${member.birthdate }" class="form-control me-2 widthAuto" /></td>
             </tr>
             <tr>
                 <th>전화번호</th>
-                <td><input type="text" name="phoneNo"  class="form-control me-2 widthAuto" /></td>
+                <td><input type="text" name="phoneNo" value="${member.phoneNo }" class="form-control me-2 widthAuto" /></td>
                 <th>이메일</th>
-                <td><input type="email" name="email" class="form-control me-2 widthAuto"  /></td>
+                <td><input type="email" name="email" value="${member.email }"class="form-control me-2 widthAuto"  /></td>
  
             </tr>
             <tr>
                 <th>소속부서</th>
-                <td><input type="text" name="department"  class="form-control me-2 widthAuto" /></td>
+                <td><input type="text" name="department" value="${member.department }" class="form-control me-2 widthAuto" /></td>
                 <th>직책</th>
-                <td><input type="text" name="position" class="form-control me-2 widthAuto" /></td>
+                <td><input type="text" name="position" value="${member.position }" class="form-control me-2 widthAuto" /></td>
+            </tr>
+            <tr>
+                <th>직업</th>
+                <td colspan="3"><input type="text" name="job" value="${member.job }" class="form-control me-2 widthAuto"  /></td>
             </tr>
             <tr>
                 <th>주소</th>
                 <td colspan="3">
                     <div style="display: flex; align-items: center;">
-                        <input type="text" id="zipcode" name="zipcode"  class="form-control me-2 widthAuto " placeholder="주소를 검색해주세요" readonly />
+                        <input type="text" id="zipcode" name="zipcode" value="${member.zipcode }" class="form-control me-2 widthAuto " placeholder="주소를 검색해주세요" readonly />
                         <button type="button" class="btn btn-sm btn-primary" id="addressSearchButton">주소 검색</button>
                     </div>
-                    <input type="text" id="address" name="addr1" class="form-control mt-2 widthAuto"  placeholder="주소를 검색해주세요" readonly />
-                    <input type="text" id="detailedAddress" name="addr2" class="form-control mt-2"  placeholder="상세주소를 입력하세요" style="width:43%"/>
+                    <input type="text" id="address" name="addr1" class="form-control mt-2 widthAuto" value="${member.addr1 }" placeholder="주소를 검색해주세요" readonly />
+                    <input type="text" id="detailedAddress" name="addr2" class="form-control mt-2" value="${member.addr2 }" placeholder="상세주소를 입력하세요" style="width:43%"/>
                 </td>
             </tr>
             <tr>
-                <th>소속기업</th>
+                <th>강사 소개(최대 300자)</th>
                 <td colspan="3">
-                    <select id="group" name="bizRegNo" class="form-select" required>
-                        <option value="">선택</option>
-                        <c:forEach var="company" items="${company }">
-                            <option value="${company.corpBiz }" <c:if test="${company.corpBiz == member.bizRegNo}">selected</c:if>>
-                                    ${company.corpName }
-                            </option>
-                        </c:forEach>
-                    </select>
+                    <textarea id="bios" name="bios" class="area" maxlength="300" ><c:out value="${member.bios}" /></textarea><br/>
+                    <span id="bios-count" class="char-count">0/300</span>
                 </td>
             </tr>
             <tr>
-                <th>사업자등록번호</th>
-                <td><input type="text" id="businessRegistrationNumber" name="businessRegistrationNumber"  class="form-control widthAuto" readonly /></td>
-                <th>대표전화번호</th>
-                <td><input type="text" id="phoneNo" name="companyPhoneNo"  class="form-control widthAuto" readonly /></td>
+                <th>경력 사항(최대 500자)</th>
+                <td colspan="3">
+                    <textarea id="career" name="career" class="area"  maxlength="500" ><c:out value="${member.bios}" /></textarea><br/>
+                    <span id="career-count" class="char-count">0/500</span>
+                </td>
             </tr>
-            <tr>
-                <th>사업장명</th>
-                <td><input type="text" id="businessName" name="businessName"  class="form-control widthAuto" readonly /></td>
-                <th>대표자명</th>
-                <td><input type="text" id="representativeName" name="representativeName"  class="form-control widthAuto" readonly /></td>
-            </tr>
-            <tr>
-                <th>업태</th>
-                <td><input type="text" id="industryType" name="industryType"  class="form-control widthAuto" readonly /></td>
-                <th>종목</th>
-                <td><input type="text" id="businessCategory" name="businessCategory"  class="form-control widthAuto" readonly /></td>
-            </tr>
-            <tr>
-                <th>사업장주소</th>
-                <td colspan="4"><input type="text" id="businessAddress" name="businessAddress" class="form-control"  readonly style="width:43%"/></td>
-            </tr>
+
         </table>
 
         <!-- 등록 및 목록 버튼 -->
@@ -103,47 +85,33 @@
             <button type="submit" class="btn btn-success" id="submitBtn">저장</button>
             <button type="button" class="btn btn-secondary" id="btnList">목록</button>
         </div>
-        <input type="hidden" name="type" value="C">
+        <input type="hidden" name="type" value="U">
     </form>
 </div>
 </div>
 
 <script>
+function updateCharCount(textareaId, maxLength) {
+    const textarea = $('#' + textareaId);
+    const countSpan = $('#' + textareaId + '-count');
+    countSpan.text(textarea.val().length + '/' + maxLength);
+
+}
+
 $(document).ready(function() {
+    $('#bios').on('input', function() {
+        updateCharCount('bios', 300);
+    });
+
+    // 경력사항 textarea
+    $('#career').on('input', function() {
+        updateCharCount('career', 500);
+    });
+
+    updateCharCount('bios', 300);
+    updateCharCount('career', 500);
+
 	autoHyphenForPhone('input[name="phoneNo"]');
-
-    $('#group').change(function() {
-        var selectedCorpBiz = $(this).val();
-
-        if (selectedCorpBiz) {
-
-            myFetch({
-                url: '/admin/member/companyDetail',
-                data: { corpBiz: selectedCorpBiz },
-                success: function(response) {
-                    const resultData = response.result[0];
-
-                    $('#businessRegistrationNumber').val(resultData.bizRegNo);
-                    $('#businessName').val(resultData.corpName);
-                    $('#representativeName').val(resultData.repName);
-                    $('#phoneNo').val(resultData.phoneNo);
-                    $('#industryType').val(resultData.bizType);
-                    $('#businessCategory').val(resultData.bizItem);
-                    $('#businessAddress').val(resultData.addr1 + " " + resultData.addr2);
-                },
-                error: function(error) {
-                    console.error('AJAX 오류:', error);
-                }
-            });
-        } else {
-            $('#businessRegistrationNumber, #phoneNo, #businessName, #representativeName, #industryType, #businessCategory, #businessAddress').val('');
-        }
-    });
-
-    $("#userId").on('input', function() {
-        var input = $(this).val();
-        $(this).val(input.replace(/[^a-zA-Z0-9]/g, ''));
-    });
 
     $.validator.addMethod("passwordComplexity", function(value, element) {
         return this.optional(element) || /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{5,}$/.test(value);
@@ -160,21 +128,6 @@ $(document).ready(function() {
                 required: true,
                 minlength: 5,
                 maxlength: 15,
-                remote: {
-                    url: "/admin/member/checkDuplicateId",
-                    type: "post",
-                    cache: false,  // 캐시 방지
-                    data: {
-                        id: function () {
-                            return $("#userId").val();
-                        }
-                    },
-                    dataType: "json",
-                    dataFilter: function(response) {
-                        var parsedResponse = typeof response === "string" ? JSON.parse(response) : response;
-                        return parsedResponse.status ? "true" : "false";  // true/false 반환
-                    }
-                }
             },
             name: {
                 required: true,
@@ -202,18 +155,9 @@ $(document).ready(function() {
             email: {
                 required: true,
                 email: true
-            },
-            bizRegNo: {
-                required: true
             }
         },
         messages: {
-            id: {
-                required: "아이디를 입력하세요.",
-                minlength: "아이디는 최소 5자 이상이어야 합니다.",
-                maxlength: "아이디는 최대 15자 이하여야 합니다.",
-                remote: "사용 할 수 없는 아이디입니다."
-            },
             name: {
                 required: "이름을 입력하세요.",
                 minlength: "이름은 최소 2자 이상이어야 합니다.",
@@ -240,9 +184,6 @@ $(document).ready(function() {
             email: {
                 required: "이메일을 입력하세요.",
                 email: "올바른 이메일 형식을 입력하세요."
-            },
-            bizRegNo: {
-                required: "소속기업을 선택해주세요."
             }
         },
         
@@ -255,19 +196,20 @@ $(document).ready(function() {
         if ($("#registForm").valid()) {
         	
             myFetch({
-                url: '/admin/member/saveMember',
+                url: '/admin/member/saveInstructor',
                 data: 'registForm',
                 success: function(response) {
                     alert(response.message);
-                    window.location.href = "<c:url value='/admin/member/memberList'/>";
+                    window.location.href = "<c:url value='/admin/member/instructorList'/>";
                 },
                 error: function(error) {
-                    console.error('등록 중 오류 발생:', error);
-                    alert('등록이 실패하였습니다.');
+                    console.error('수정 중 오류 발생:', error);
+                    alert('수정이 실패하였습니다.');
                 }
             });
         } else {
-            event.preventDefault();
+            //alert("유효성 검사를 통과하지 못했습니다. 입력 값을 확인해주세요.");
+            event.preventDefault(); 
         }
 
     });
@@ -275,7 +217,7 @@ $(document).ready(function() {
 	
 	$('#btnList').on('click', function(event){
 		event.preventDefault();
-		window.location.href = "<c:url value='/admin/member/memberList'/>";
+		window.location.href = "<c:url value='/admin/member/instructorList'/>";
 	});
 
     $('#addressSearchButton').on('click', function() {

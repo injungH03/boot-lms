@@ -23,6 +23,7 @@ public class LectureMemDTO extends LectureMasterVO {
 	private int lectureCode;
 	private int enrollCode;
 	private String corpBiz;
+	private int enrolled;
 	
 	private List<String> memberIds;
 	private List<Integer> enrollIds;

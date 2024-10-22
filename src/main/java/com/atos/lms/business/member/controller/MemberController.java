@@ -119,6 +119,91 @@ public class MemberController {
     	return "atos/member/memberAllRegist";
     }
 
+
+    @RequestMapping("/instructorList")
+    public String instructorList(@ModelAttribute("searchVO") MemberVO memberVO, ModelMap model) throws Exception {
+
+        System.out.println("넘어온 스태이터스 코드값 = " + memberVO.getStatusCode());
+
+        PaginationInfo paginationInfo = new PaginationInfo();
+
+        paginationInfo.setCurrentPageNo(memberVO.getPageIndex());
+        paginationInfo.setRecordCountPerPage(memberVO.getPageUnit());
+        paginationInfo.setPageSize(memberVO.getPageSize());
+
+        memberVO.setFirstIndex(paginationInfo.getFirstRecordIndex());
+        memberVO.setLastIndex(paginationInfo.getLastRecordIndex());
+        memberVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
+
+        Map<String, Object> map = memberService.selectInstructorList(memberVO);
+
+
+        int totalcount = Integer.parseInt(String.valueOf(map.get("resultCnt")));
+
+        paginationInfo.setTotalRecordCount(totalcount);
+
+
+//    	List<MemberVO> list = (List<MemberVO>) map.get("resultList");
+//
+//    	list.forEach(mem -> {
+//    		System.out.println(">>" + mem);
+//    		System.out.println("상태이름 = " + mem.getListStatusName());
+//    	});
+//
+
+        List<MemberVO> status = memberService.selectStatusCode();
+
+        model.addAttribute("resultList", map.get("resultList"));
+        model.addAttribute("paginationInfo", paginationInfo);
+        model.addAttribute("status", status);
+        model.addAttribute("totalcount", totalcount);
+
+        return "atos/member/instructorList";
+    }
+
+    @RequestMapping("instructorRegistView")
+    public String instructorRegistView(@ModelAttribute("searchVO") MemberVO memberVO, ModelMap model) throws Exception {
+
+        return "atos/member/instructorRegist";
+    }
+
+    @RequestMapping("instructorUpdateView")
+    public String instructorUpdateView(@ModelAttribute("searchVO") MemberVO memberVO, ModelMap model) throws Exception {
+
+        model.addAttribute("member", memberService.selectInstructorKey(memberVO));
+
+        return "atos/member/instructorUpdt";
+    }
+
+    @RequestMapping("/instructorDetail")
+    public String instructorDetail(@ModelAttribute("searchVO") MemberVO memberVO,  ModelMap model) throws Exception {
+
+//    	System.out.println("넘어온 데이터  = " + memberVO);
+
+        model.addAttribute("member", memberService.selectInstructorKey(memberVO));
+
+        return "atos/member/instructorDetail";
+    }
+
+    @RequestMapping("/instructorListExcelDown")
+    public void instructorListExcelDown(HttpServletResponse response, MemberVO memberVO) throws Exception {
+        memberService.instructorListExcelDown(response, memberVO);
+    }
+
+    @RequestMapping("/saveInstructor")
+    @ResponseBody
+    public ResponseEntity<ResponseVO<Void>> saveInstructor(@RequestBody MemberVO memberVO) throws Exception {
+
+//    	System.out.println(">>>>입력값  =  " + memberVO.toString());
+
+        String message = memberService.saveInstructor(memberVO);
+
+        ResponseVO<Void> response = ResponseHelper.success(message);
+
+        return new ResponseEntity<>(response, response.getHttpStatus());
+    }
+
+
     @RequestMapping("/checkDuplicateId")
     @ResponseBody
     public Map<String, Object> checkDuplicateId(@RequestParam("id") String id) throws Exception {
@@ -148,11 +233,9 @@ public class MemberController {
     
     @RequestMapping("/updateStatus")
     @ResponseBody
-    public ResponseEntity<ResponseVO<Void>> updateStatus(
-    		@RequestParam("ids") String ids,
-            @RequestParam("status") String status) throws Exception {
+    public ResponseEntity<ResponseVO<Void>> updateStatus(@RequestBody MemberVO memberVO) throws Exception {
     	
-    	String message = memberService.updateStatus(ids, status);
+    	String message = memberService.updateStatus(memberVO);
 
         ResponseVO<Void> response = ResponseHelper.success(message);
 
@@ -191,32 +274,7 @@ public class MemberController {
 
         return new ResponseEntity<>(response, response.getHttpStatus());
     }
-    
-//    @RequestMapping("/memberInsert")
-//    @ResponseBody
-//    public ResponseEntity<ResponseVO<Void>> memberInsert(@RequestBody MemberVO memberVO) throws Exception {
-//
-////    	System.out.println(">>>>입력값  =  " + memberVO.toString());
-//
-//    	String message = memberService.insertMember(memberVO);
-//
-//        ResponseVO<Void> response = ResponseHelper.success(message);
-//
-//        return new ResponseEntity<>(response, response.getHttpStatus());
-//    }
-//
-//    @RequestMapping("/memberUpdate")
-//    @ResponseBody
-//    public ResponseEntity<ResponseVO<Void>> memberUpdate(@RequestBody MemberVO memberVO) throws Exception {
-//
-////    	System.out.println(">>>>입력값  =  " + memberVO.toString());
-//
-//    	String message = memberService.updateMember(memberVO);
-//
-//        ResponseVO<Void> response = ResponseHelper.success(message);
-//
-//        return new ResponseEntity<>(response, response.getHttpStatus());
-//    }
+
     @RequestMapping("/memberAllSave")
     @ResponseBody
     public ResponseEntity<ResponseVO<Void>> memberAllSave(@RequestBody MemberAllDTO memberAllDTO) {
@@ -251,7 +309,7 @@ public class MemberController {
     	
     }
     
-    @RequestMapping("/member/sampleExcelDown")
+    @RequestMapping("/sampleExcelDown")
     public void sampleExcelDown(HttpServletResponse response, MemberVO memberVO) throws Exception {
     	
     	memberService.sampleExcelDown(response);

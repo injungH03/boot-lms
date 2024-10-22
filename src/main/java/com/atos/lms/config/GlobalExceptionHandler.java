@@ -1,6 +1,7 @@
 package com.atos.lms.config;
 
 import com.atos.lms.common.model.ResponseVO;
+import com.atos.lms.common.utl.GlobalsProperties;
 import com.atos.lms.common.utl.ResponseHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -21,7 +22,13 @@ import java.util.NoSuchElementException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    private final GlobalsProperties globalsProperties;
+
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    public GlobalExceptionHandler(GlobalsProperties globalsProperties) {
+        this.globalsProperties = globalsProperties;
+    }
 
     @ExceptionHandler(NoSuchElementException.class)
     public Object handleNotFoundException(NoSuchElementException ex, HttpServletRequest request) {
@@ -114,7 +121,7 @@ public class GlobalExceptionHandler {
     }
 
     private boolean isDevEnvironment() {
-        String env = System.getenv("APP_ENV");
+        String env = globalsProperties.getLocalDev();
         return "development".equalsIgnoreCase(env);
     }
 }
