@@ -1,6 +1,6 @@
 package com.atos.lms.business.education.service;
 
-import com.atos.lms.business.education.model.EducationExcelDTO;
+import com.atos.lms.business.education.model.EducationExcelVO;
 import com.atos.lms.business.education.model.EducationMasterVO;
 import com.atos.lms.business.education.model.EducationVO;
 import org.apache.ibatis.annotations.Mapper;
@@ -34,7 +34,7 @@ public interface EducationDAO {
     List<EducationMasterVO> selectCompletionCriteria();
 
     // 엑셀 다운로드용 교육 과정 리스트 조회
-    List<EducationExcelDTO> selectEducationListForExcel(EducationVO educationVO);
+    List<EducationExcelVO> selectEducationListForExcel(EducationVO educationVO);
 
     // 교육 과정 상세 조회
     EducationVO selectEducationDetail(EducationVO educationVO);

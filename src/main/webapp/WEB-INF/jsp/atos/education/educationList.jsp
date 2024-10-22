@@ -65,7 +65,9 @@
 
 <!-- 테이블 위에 버튼 섹션 -->
             <div class="d-flex justify-content-between mb-2 mt-5">
-                <div>Total: <strong>${paginationInfo.totalRecordCount}건</strong></div>
+                <div>
+                Total: <strong>${paginationInfo.totalRecordCount}건</strong>
+                </div>
                 <div>
                     <button class="btn-create-course" id="statusUpdateBtn">상태변경</button>
                     <button class="btn-excel" id="excelDownloadBtn">EXCEL</button>

@@ -36,7 +36,7 @@ public class AllAttendanceController {
     }
 
     // 출석 목록 조회
-    @RequestMapping("/allAttendanceList")
+    @RequestMapping("/attendanceList")
     public String allAttendanceList(@ModelAttribute("attendanceSearchVO") AllAttendanceVO attendanceVO, ModelMap model) throws Exception {
         LOGGER.info("allAttendanceList 접근");
 
@@ -112,7 +112,7 @@ public class AllAttendanceController {
             paramMap.put("outTime", outTime.format(formatter));
             allAttendanceService.updateCheckOutAll(paramMap);
 
-            return ResponseEntity.ok(ResponseHelper.successWithResult("퇴실 처리 완료", null));
+            return ResponseEntity.ok("success");  // 수정된 부분
         } catch (Exception e) {
             LOGGER.error("퇴실 처리 실패", e);
             return ResponseEntity.status(500).body(ResponseHelper.error("500", "퇴실 처리 실패", HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage()));

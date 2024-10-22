@@ -8,7 +8,7 @@
     <sql id="whereClause">
         <trim prefix="WHERE" prefixOverrides="AND">
             <if test="true">
-                a.STATUS != '4002'
+               a.STATUS IS NULL OR a.STATUS != '4002'
             </if>
             <!-- 교육 코드(Education)에 해당하는 강의 코드 필터링 -->
             <if test="lectureCode > 0">
@@ -42,6 +42,8 @@
         </trim>
     </sql>
 
+
+
 <!-- 출석 목록 조회 쿼리 -->
 <select id="selectAttendanceList" parameterType="com.atos.lms.business.attendance.model.AllAttendanceVO"
         resultType="com.atos.lms.business.attendance.model.AllAttendanceVO">
@@ -51,11 +53,10 @@
         a.ATTEND_DATE,        <!-- 출석 날짜 -->
         a.IN_TIME,            <!-- 입실 시간 -->
         a.OUT_TIME,           <!-- 퇴실 시간 -->
-        a.STATUS,             <!-- 출석 상태 -->
+        a.STATUS AS statusName,<!-- 출석 상태명 바로 조회 -->
         s.MEMBER_ID,          <!-- 수강생 ID -->
         m.NAME,               <!-- 수강생 이름 -->
         c.CORP_NAME,          <!-- 회사명 (소속) -->
-        d.NAME AS statusName, <!-- 상태 명칭 (출석, 결석 등) -->
         e.TITLE AS title      <!-- 강의명 (과정명) -->
     FROM
         ATOS_ATTENDANCE a
@@ -68,8 +69,6 @@
     LEFT JOIN
         ATOS_COMPANY c ON mn.BIZ_REG_NO = c.BIZ_REG_NO <!-- 회사 정보 연결 -->
     LEFT JOIN
-        ATOS_STATUS d ON a.STATUS = d.CODE            <!-- 출석 상태 연결 -->
-    LEFT JOIN
         ATOS_LECTURE l ON s.LECTURE_ID = l.LECTURE_CODE
     LEFT JOIN
         ATOS_EDUCATION e ON l.EDUCATION = e.EDU_CODE  <!-- 교육 정보 (강의명) -->
@@ -79,7 +78,6 @@
     LIMIT
         #{recordCountPerPage} OFFSET #{firstIndex}
 </select>
-
 
 
 <!-- 출석 목록 총 개수 조회 쿼리 -->
@@ -116,7 +114,7 @@
     <update id="updateCheckOut" parameterType="map">
         UPDATE ATOS_ATTENDANCE
         SET OUT_TIME = #{outTime},
-            STATUS = CASE WHEN IN_TIME IS NOT NULL THEN '3001' ELSE STATUS END
+            STATUS = CASE WHEN IN_TIME IS NOT NULL THEN '출석' ELSE STATUS END
         WHERE ATTEND_CODE = #{attendCode}
     </update>
 
@@ -143,7 +141,7 @@
     <update id="updateCheckOutAll" parameterType="map">
         UPDATE ATOS_ATTENDANCE
         SET OUT_TIME = #{outTime},
-            STATUS = CASE WHEN IN_TIME IS NOT NULL THEN '3001' ELSE STATUS END
+            STATUS = CASE WHEN IN_TIME IS NOT NULL THEN '출석' ELSE STATUS END
         WHERE ATTEND_CODE IN
         <foreach item="item" collection="attendCodes" open="(" separator="," close=")">
             #{item}
@@ -153,7 +151,7 @@
     <!-- 결석 처리 업데이트 -->
     <update id="updateAllAbsence" parameterType="list">
         UPDATE ATOS_ATTENDANCE
-        SET STATUS = '3002',
+        SET STATUS = '결석',
             IN_TIME = NULL,
             OUT_TIME = NULL,
             ATTEND_DATE = NULL

@@ -157,7 +157,7 @@
     </select>
 
     <!-- 엑셀 다운로드 쿼리 -->
-    <select id="selectEducationListForExcel" parameterType="com.atos.lms.business.education.model.EducationVO" resultType="com.atos.lms.business.education.model.EducationExcelDTO">
+    <select id="selectEducationListForExcel" parameterType="com.atos.lms.business.education.model.EducationVO" resultType="com.atos.lms.business.education.model.EducationExcelVO">
         SELECT
             a.TITLE AS title,                            <!-- 교육명 -->
             CONCAT_WS(' > ', m.MAIN_NAME, sub.SUB_NAME) AS category,  <!-- 교육 분류 명칭 (대분류 > 중분류) -->

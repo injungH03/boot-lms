@@ -19,7 +19,7 @@
         <span>&nbsp;교육 과정 목록</span>
     </div>
 
-<form id="searchForm" name="searchForm" action="<c:url value='/admin/education/'/>" method="get">
+<form id="searchForm" name="searchForm" action="<c:url value='/admin/education/attendanceList'/>" method="get">
  <input type="hidden" name="pageIndex" value="${attendanceSearchVO.pageIndex}">
 
     <div class="table-section">
@@ -27,7 +27,7 @@
 <!-- 과정 선택 -->
         <table class="search-table">
             <tr>
-                <th>과정명</th>
+                <th class="custom-th-width">과정명</th>
                 <td>
                     <div class="d-flex">
 						<select name="lectureCode" class="form-select search-selectle me-2">
@@ -46,11 +46,11 @@
 <!-- 출석일 선택 -->
             <tr>
                 <th>출석일</th>
-                <td colspan="2">
+                <td colspan="3">
                     <div class="d-flex">
-                        <input type="date" name="srcStartDate" id="startDate" class="form-control me-2 custom-date-picker" 
+                        <input type="date" name="srcStartDate" id="startDate" class="form-control me-2 custom-width" 
                                value="${attendanceSearchVO.srcStartDate}"/>
-                        <input type="date" name="srcEndDate" id="endDate" class="form-control me-2 custom-date-picker" 
+                        <input type="date" name="srcEndDate" id="endDate" class="form-control me-2  custom-width" 
                                value="${attendanceSearchVO.srcEndDate}"/>
                     </div>
                 </td>
@@ -72,16 +72,17 @@
                 </td>
             </tr>
         </table>
-    </form>
+    
 
 
     <!-- 테이블 위에 버튼 섹션 -->
-    <div class="d-flex justify-content-end mb-2 mt-5">
+    <div class="d-flex justify-content-between mb-2 mt-5">
+        <div>Total: <strong>${paginationInfo.totalRecordCount}건</strong></div>
         <div>
             <button class="btn-create-course" id="attendAllCheckIn">입실처리</button>
             <button class="btn-create-course" id="attendAllCheckOut">퇴실처리</button>
             <button class="btn-create-course" id="attendAllAbsence">결석처리</button>
-            <button type="button" class="btn-excel" id="excelDown">Excel</button>
+            <button class="btn-excel" id="excelDownloadBtn">EXCEL</button>
         </div>
     </div>
 
@@ -127,18 +128,18 @@
                         <td>${resultInfo.outTime}</td> <!-- 퇴실 시간 -->
                         <td class="manage">                  
                             <!-- 입실 버튼: 입실 시간이 이미 있을 경우 비활성화 -->
-                            <span class="status-box me-2 status-attend" 
+                            <button class="btn-state attend"
                                 data-attend-code="${resultInfo.attendCode}" 
                                 <c:if test="${resultInfo.inTime != null || resultInfo.statusName == '결석'}">style="pointer-events: none; opacity: 0.5;"</c:if>>
                                 입실
-                            </span>
+                            </button>
                             
                             <!-- 퇴실 버튼: 퇴실 시간이 이미 있을 경우 비활성화 -->
-                            <span class="status-box status-absent" 
+                            <button class="btn-state absent"
                                 data-attend-code="${resultInfo.attendCode}" 
                                 <c:if test="${resultInfo.outTime != null || resultInfo.statusName == '결석'}">style="pointer-events: none; opacity: 0.5;"</c:if>>
                                 퇴실
-                            </span>                      
+                            </button>
                 
                         </td>
                         <td><input type="checkbox" name="rowCheck" value="${resultInfo.attendCode}"></td>
@@ -172,59 +173,97 @@
 
 
 
+<!-- 입실, 퇴실, 모달 -->
+<div class="modal fade" id="attendanceModal" tabindex="-1" aria-labelledby="attendanceModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="attendanceModalLabel">시간 입력</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3" id="dateInputContainer">
+          <label for="modalDateInput" class="form-label">출석일</label>
+          <input type="date" class="form-control" id="modalDateInput">
+        </div>
+        <div class="mb-3">
+          <label for="modalTimeInput" class="form-label">시간</label>
+          <input type="time" class="form-control" id="modalTimeInput">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="confirmTimeBtn">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
 <script>
 
 $(document).ready(function() {
 	
-	// 입실 버튼 클릭 시
-	 $('.status-attend').click(function() {
-	     var attendCode = $(this).data('attend-code');
+ // 입실 버튼 클릭 시
+    $('.btn-state.attend').click(function() {
+        var attendCode = $(this).data('attend-code');
 
-	     $.ajax({
-	         url: "<c:url value='/admin/education/checkIn' />",
-	         type: "POST",
-	         data: { attendCode: attendCode },
-	         success: function(response) {
-	             if (response === 'success') {
-	                 alert("입실 처리가 완료되었습니다.");
-	                 location.reload(); // 페이지 새로고침
-	             } else {
-	                 alert("입실 처리에 실패하였습니다.");
-	             }
-	         },
-	         error: function() {
-	             alert("입실 처리 중 오류가 발생하였습니다.");
-	         }
-	     });
-	 });
+        $.ajax({
+            url: "<c:url value='/admin/education/checkIn' />",
+            type: "POST",
+            data: { attendCode: attendCode },
+            success: function(response) {
+                // response.status 확인 후 처리
+                if (response.status) {
+                    alert(response.message || "입실 처리가 완료되었습니다.");
+                    location.reload(); // 페이지 새로고침
+                } else {
+                    alert(response.message || "입실 처리에 실패하였습니다.");
+                }
+            },
+            error: function() {
+                alert("입실 처리 중 오류가 발생하였습니다.");
+            }
+        });
+    });
 
-	 // 퇴실 버튼 클릭 시
-	 $('.status-absent').click(function() {
-	     var attendCode = $(this).data('attend-code');
+    // 퇴실 버튼 클릭 시
+    $('.btn-state.absent').click(function() {
+        var attendCode = $(this).data('attend-code');
 
-	     $.ajax({
-	         url: "<c:url value='/admin/education/checkOut' />",
-	         type: "POST",
-	         contentType: "application/json",  // JSON 형식으로 전송
-	         data: JSON.stringify({ attendCodes: [attendCode] }),  // 배열로 전달
-	         success: function(response) {
-	             if (response === 'success') {
-	                 alert("퇴실 처리가 완료되었습니다.");
-	                 location.reload(); // 페이지 새로고침
-	             } else {
-	                 alert("퇴실 처리에 실패하였습니다.");
-	             }
-	         },
-	         error: function(xhr) {
-	             if (xhr.status === 400) {
-	                 alert(xhr.responseText); // "입실 처리가 완료되지 않은 수강생이 있습니다." 메시지 출력
-	             } else {
-	                 alert("퇴실 처리 중 오류가 발생하였습니다.");
-	             }
-	         }
-	     });
-	 });
-	 
+        $.ajax({
+            url: "<c:url value='/admin/education/checkOut' />",
+            type: "POST",
+            contentType: "application/json",  // JSON 형식으로 전송
+            data: JSON.stringify({ attendCodes: [attendCode] }),  // 배열로 전달
+            success: function(response) {
+                // response === "success" 확인 후 처리
+                if (response === "success") {
+                    alert("퇴실 처리가 완료되었습니다.");
+                    location.reload(); // 페이지 새로고침
+                } else {
+                    alert(response.message || "퇴실 처리에 실패하였습니다.");
+                }
+            },
+            error: function(xhr) {
+                if (xhr.status === 400) {
+                    alert(xhr.responseText || "입실 처리가 완료되지 않은 출석 코드입니다.");
+                } else {
+                    alert("퇴실 처리 중 오류가 발생하였습니다.");
+                }
+            }
+        });
+    });
 	 
 	
     // 전체 선택/해제 기능
@@ -300,11 +339,11 @@ $(document).ready(function() {
                 alert("날짜를 입력해주세요.");
                 return;
             }
-            url = "<c:url value='/attendance/checkInAll' />";
+            url = "<c:url value='/admin/education/checkInAll' />";
             data.inTime = time;
             data.attendDate = date;
         } else if (actionType === 'checkOut') {
-            url = "<c:url value='/attendance/checkOutAll' />";
+            url = "<c:url value='/admin/education/checkOutAll' />";
             data.outTime = time;
         }
 
@@ -351,7 +390,7 @@ $(document).ready(function() {
         }
 
         $.ajax({
-            url: "<c:url value='/attendance/allAbsence' />",
+            url: "<c:url value='/admin/education/allAbsence' />",
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify({ attendCodes: selectedAttendanceCodes }),
@@ -394,7 +433,7 @@ $(document).ready(function() {
         const originalAction = attendanceForm.attr('action');
 
         // 엑셀 다운로드 경로로 form action 설정
-        attendanceForm.attr('action', '<c:url value="/attendance/attendanceExcelDownload"/>');
+        attendanceForm.attr('action', '<c:url value="/admin/education/attendanceExcelDownload"/>');
         
         attendanceForm.submit();  // form 제출로 검색 조건과 함께 전송
         

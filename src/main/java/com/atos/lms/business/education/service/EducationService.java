@@ -1,7 +1,7 @@
 package com.atos.lms.business.education.service;
 
 
-import com.atos.lms.business.education.model.EducationExcelDTO;
+import com.atos.lms.business.education.model.EducationExcelVO;
 import com.atos.lms.business.education.model.EducationMasterVO;
 import com.atos.lms.business.education.model.EducationVO;
 import com.atos.lms.common.utl.ExcelUtil;
@@ -82,20 +82,20 @@ public class EducationService {
 
     // 엑셀 다운로드 처리
     public void educationListExcelDown(HttpServletResponse response, EducationVO educationVO) throws Exception {
-        List<EducationExcelDTO> educationList = educationDAO.selectEducationListForExcel(educationVO);
+        List<EducationExcelVO> educationList = educationDAO.selectEducationListForExcel(educationVO);
 
         // 엑셀 파일로 출력 (필드 매핑 포함)
         ExcelUtil.exportToExcel(response, educationList, "교육목록", "교육목록엑셀파일", Map.of(
-            "title", "교육명",
-            "category", "교육 분류",
-            "description", "과정 소개",
-            "objective", "과정 목표",
-            "completionCriteria", "수료 조건",
-            "note", "비고",
-            "status", "상태",
-            "trainingTime", "교육 시간",
-            "regDate", "등록일",
-            "register", "등록자"
+                "title", "교육명",
+                "category", "교육 분류",
+                "description", "과정 소개",
+                "objective", "과정 목표",
+                "completionCriteria", "수료 조건",
+                "note", "비고",
+                "status", "상태",
+                "trainingTime", "교육 시간",
+                "regDate", "등록일",
+                "register", "등록자"
         ));
     }
 

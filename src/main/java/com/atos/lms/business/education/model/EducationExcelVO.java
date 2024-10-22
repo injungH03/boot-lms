@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class EducationExcelDTO extends EducationMasterVO {
+public class EducationExcelVO extends EducationMasterVO {
 
 
     private String title; // 명칭
