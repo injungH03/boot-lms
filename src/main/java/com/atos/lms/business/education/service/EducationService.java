@@ -49,16 +49,24 @@ public class EducationService {
     }
 
     // 상태 업데이트
-    public void updateStatus(List<Integer> eduCodes, String status) {
-        EducationMasterVO educationMasterVO = new EducationMasterVO();
-        educationMasterVO.setEduCodeList(eduCodes);
-        educationMasterVO.setStatusCode(status);
+    public void updateStatus(EducationMasterVO educationMasterVO) {
+        // 교육 과정 상태 업데이트
         educationDAO.updateStatus(educationMasterVO);
+
+        // 상태가 '폐강(4002)'일 경우, 관련 강의도 '폐강'으로 상태 변경
+        if ("4002".equals(educationMasterVO.getStatusCode())) {
+            for (Integer eduCode : educationMasterVO.getEduCodeList()) {
+                EducationVO educationVO = new EducationVO();
+                educationVO.setEduCode(eduCode);
+                educationVO.setStatus("4002"); // '폐강' 상태 코드
+                educationDAO.deleteLecturesByEduCode(educationVO);
+            }
+        }
     }
 
     // 교육 과정 등록
     public void insertEducation(EducationVO educationVO) {
-        educationVO.setStatus("1002"); // 기본 상태 설정
+        educationVO.setStatus("4001"); // 기본 상태 설정
         educationDAO.insertEducation(educationVO);
     }
 

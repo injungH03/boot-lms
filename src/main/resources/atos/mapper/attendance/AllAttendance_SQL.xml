@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atos.lms.business.attendance.service.AllAttendanceDAO">
+
+   <!-- 조건에 따른 동적 WHERE 절 구성 -->
+    <sql id="whereClause">
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="true">
+                a.STATUS != '4002'
+            </if>
+            <!-- 교육 코드(Education)에 해당하는 강의 코드 필터링 -->
+            <if test="lectureCode > 0">
+                AND l.LECTURE_CODE = #{lectureCode}
+            </if>
+            <!-- 출석일 범위 조건 추가 -->
+            <if test="srcStartDate != null and srcStartDate != ''">
+                <![CDATA[
+                AND a.ATTEND_DATE >= #{srcStartDate}
+                ]]>
+            </if>
+            <if test="srcEndDate != null and srcEndDate != ''">
+                <![CDATA[
+                AND a.ATTEND_DATE <= #{srcEndDate}
+                ]]>
+            </if>
+            <!-- 검색 조건 추가 -->
+            <if test="searchCnd == null or searchCnd == ''">
+                AND (m.NAME LIKE CONCAT('%', #{searchWrd}, '%') OR c.CORP_NAME LIKE CONCAT('%', #{searchWrd}, '%'))
+            </if>
+            <if test="searchCnd != null and searchCnd != ''">
+                <choose>
+                    <when test="searchCnd == 0">
+                        AND m.NAME LIKE CONCAT('%', #{searchWrd}, '%')
+                    </when>
+                    <when test="searchCnd == 1">
+                        AND c.CORP_NAME LIKE CONCAT('%', #{searchWrd}, '%')
+                    </when>
+                </choose>
+            </if>
+        </trim>
+    </sql>
+
+<!-- 출석 목록 조회 쿼리 -->
+<select id="selectAttendanceList" parameterType="com.atos.lms.business.attendance.model.AllAttendanceVO"
+        resultType="com.atos.lms.business.attendance.model.AllAttendanceVO">
+    SELECT
+        a.ATTEND_CODE,        <!-- 출석 코드 -->
+        a.ENROLL_ID,          <!-- 수강생 배정 코드 -->
+        a.ATTEND_DATE,        <!-- 출석 날짜 -->
+        a.IN_TIME,            <!-- 입실 시간 -->
+        a.OUT_TIME,           <!-- 퇴실 시간 -->
+        a.STATUS,             <!-- 출석 상태 -->
+        s.MEMBER_ID,          <!-- 수강생 ID -->
+        m.NAME,               <!-- 수강생 이름 -->
+        c.CORP_NAME,          <!-- 회사명 (소속) -->
+        d.NAME AS statusName, <!-- 상태 명칭 (출석, 결석 등) -->
+        e.TITLE AS title      <!-- 강의명 (과정명) -->
+    FROM
+        ATOS_ATTENDANCE a
+    LEFT JOIN
+        ATOS_ENROLLMENT s ON a.ENROLL_ID = s.ENROLL_CODE
+    LEFT JOIN
+        ATOS_MEMBER m ON s.MEMBER_ID = m.ID
+    LEFT JOIN
+        ATOS_MEMBER_NOMAL mn ON m.ID = mn.MEMBER_ID   <!-- 회원 정보와 회사 정보 연결 -->
+    LEFT JOIN
+        ATOS_COMPANY c ON mn.BIZ_REG_NO = c.BIZ_REG_NO <!-- 회사 정보 연결 -->
+    LEFT JOIN
+        ATOS_STATUS d ON a.STATUS = d.CODE            <!-- 출석 상태 연결 -->
+    LEFT JOIN
+        ATOS_LECTURE l ON s.LECTURE_ID = l.LECTURE_CODE
+    LEFT JOIN
+        ATOS_EDUCATION e ON l.EDUCATION = e.EDU_CODE  <!-- 교육 정보 (강의명) -->
+    <include refid="whereClause"/>  <!-- 동적 WHERE 조건 추가 -->
+    ORDER BY
+        a.ATTEND_CODE DESC
+    LIMIT
+        #{recordCountPerPage} OFFSET #{firstIndex}
+</select>
+
+
+
+<!-- 출석 목록 총 개수 조회 쿼리 -->
+<select id="selectAttendanceListCnt" parameterType="com.atos.lms.business.attendance.model.AllAttendanceVO"
+        resultType="int">
+    SELECT COUNT(a.ATTEND_CODE)
+    FROM ATOS_ATTENDANCE a
+    JOIN ATOS_ENROLLMENT en ON a.ENROLL_ID = en.ENROLL_CODE
+    JOIN ATOS_MEMBER m ON en.MEMBER_ID = m.ID
+    JOIN ATOS_MEMBER_NOMAL mn ON m.ID = mn.MEMBER_ID       <!-- 회원 정보와 회사 정보 연결 -->
+    JOIN ATOS_COMPANY c ON mn.BIZ_REG_NO = c.BIZ_REG_NO    <!-- 회사 정보 연결 -->
+    JOIN ATOS_LECTURE l ON en.LECTURE_ID = l.LECTURE_CODE
+    <include refid="whereClause"/>                         <!-- 동적 WHERE 조건 포함 -->
+</select>
+
+
+
+    <!-- 교육 목록 조회 -->
+    <select id="selectEducationList" resultType="com.atos.lms.business.attendance.model.AllAttendanceVO">
+        SELECT EDU_CODE, TITLE
+        FROM ATOS_EDUCATION
+        WHERE STATUS != '4002'
+    </select>
+
+    <!-- 입실 시간 업데이트 -->
+    <update id="updateCheckIn" parameterType="map">
+        UPDATE ATOS_ATTENDANCE
+        SET IN_TIME = #{inTime},
+            ATTEND_DATE = #{attendDate}
+        WHERE ATTEND_CODE = #{attendCode}
+    </update>
+
+    <!-- 퇴실 시간 및 상태 업데이트 -->
+    <update id="updateCheckOut" parameterType="map">
+        UPDATE ATOS_ATTENDANCE
+        SET OUT_TIME = #{outTime},
+            STATUS = CASE WHEN IN_TIME IS NOT NULL THEN '3001' ELSE STATUS END
+        WHERE ATTEND_CODE = #{attendCode}
+    </update>
+
+    <!-- 출석 코드로 특정 출석 정보 조회 -->
+    <select id="selectAttendanceByCode" parameterType="int"
+            resultType="com.atos.lms.business.attendance.model.AllAttendanceVO">
+        SELECT ATTEND_CODE, IN_TIME, OUT_TIME, ATTEND_DATE
+        FROM ATOS_ATTENDANCE
+        WHERE ATTEND_CODE = #{attendCode}
+    </select>
+
+    <!-- 입실 시간 업데이트 (전체) -->
+    <update id="updateCheckInAll" parameterType="map">
+        UPDATE ATOS_ATTENDANCE
+        SET IN_TIME = #{inTime},
+            ATTEND_DATE = #{attendDate}
+        WHERE ATTEND_CODE IN
+        <foreach item="item" collection="attendCodes" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- 퇴실 시간 업데이트 (전체) -->
+    <update id="updateCheckOutAll" parameterType="map">
+        UPDATE ATOS_ATTENDANCE
+        SET OUT_TIME = #{outTime},
+            STATUS = CASE WHEN IN_TIME IS NOT NULL THEN '3001' ELSE STATUS END
+        WHERE ATTEND_CODE IN
+        <foreach item="item" collection="attendCodes" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- 결석 처리 업데이트 -->
+    <update id="updateAllAbsence" parameterType="list">
+        UPDATE ATOS_ATTENDANCE
+        SET STATUS = '3002',
+            IN_TIME = NULL,
+            OUT_TIME = NULL,
+            ATTEND_DATE = NULL
+        WHERE ATTEND_CODE IN
+        <foreach item="item" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- 엑셀 다운로드를 위한 출석 목록 조회 쿼리 -->
+    <select id="selectAttendanceListForExcel" resultType="com.atos.lms.business.attendance.model.AllAttendanceExcelVO">
+        SELECT
+            c.CORP_NAME AS corpName,
+            e.TITLE AS title,
+            s.MEMBER_ID AS enrollId,
+            m.NAME AS name,
+            d.NAME AS status,
+            a.ATTEND_DATE AS attendDate,
+            a.IN_TIME AS inTime,
+            a.OUT_TIME AS outTime
+        FROM
+            ATOS_ATTENDANCE a
+        LEFT JOIN
+            ATOS_ENROLLMENT s ON a.ENROLL_ID = s.ENROLL_CODE
+        LEFT JOIN
+            ATOS_MEMBER m ON s.MEMBER_ID = m.ID
+        LEFT JOIN
+            ATOS_COMPANY c ON m.BIZ_REG_NO = c.BIZ_REG_NO
+        LEFT JOIN
+            ATOS_LECTURE l ON s.LECTURE_ID = l.LECTURE_CODE
+        LEFT JOIN
+            ATOS_EDUCATION e ON l.EDUCATION = e.EDU_CODE
+        LEFT JOIN
+            ATOS_STATUS d ON a.STATUS = d.CODE
+        <include refid="whereClause"/>
+        ORDER BY
+            a.ATTEND_CODE DESC
+    </select>
+
+
+
+</mapper>
+
+

@@ -57,11 +57,10 @@ public class EducationController {
 
     @RequestMapping("/updateStatus")
     @ResponseBody
-    public ResponseEntity<ResponseVO<Void>> updateStatus(@RequestBody Map<String, Object> requestData) throws Exception {
-        List<Integer> eduCodes = (List<Integer>) requestData.get("eduCodes");
-        String status = (String) requestData.get("status");
+    public ResponseEntity<ResponseVO<Void>> updateStatus(@RequestBody EducationMasterVO educationMasterVO) throws Exception {
+        // Service로 VO 전달하여 처리
+        educationService.updateStatus(educationMasterVO);
 
-        educationService.updateStatus(eduCodes, status);
         ResponseVO<Void> response = ResponseVO.<Void>builder()
                                   .httpStatus(HttpStatus.OK)
                                   .message("상태 변경 완료")
@@ -85,13 +84,23 @@ public class EducationController {
     @RequestMapping("/educationInsert")
     @ResponseBody
     public ResponseEntity<ResponseVO<Void>> educationInsert(@RequestBody EducationVO educationVO) {
-        educationService.insertEducation(educationVO);
-
-        ResponseVO<Void> response = ResponseVO.<Void>builder()
-                                  .httpStatus(HttpStatus.OK)
-                                  .message("교육 과정이 성공적으로 등록되었습니다.")
-                                  .build();
-        return new ResponseEntity<>(response, response.getHttpStatus());
+        try {
+            educationService.insertEducation(educationVO);
+            ResponseVO<Void> response = ResponseVO.<Void>builder()
+                                      .httpStatus(HttpStatus.OK)
+                                      .message("교육 과정이 성공적으로 등록되었습니다.")
+                                      .status(true)
+                                      .build();
+            return new ResponseEntity<>(response, response.getHttpStatus());
+        } catch (Exception e) {
+            LOGGER.error("교육 과정 등록 중 오류 발생", e);
+            ResponseVO<Void> response = ResponseVO.<Void>builder()
+                                      .httpStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+                                      .message("교육 과정 등록 중 오류가 발생했습니다.")
+                                      .status(false)
+                                      .build();
+            return new ResponseEntity<>(response, response.getHttpStatus());
+        }
     }
 
     @RequestMapping("/educationListExcelDown")
@@ -128,18 +137,26 @@ public class EducationController {
     @ResponseBody
     public ResponseEntity<ResponseVO<Void>> educationUpdate(@RequestBody EducationVO educationVO) {
         try {
+            // 수정 로직
             educationService.updateEducation(educationVO);
+
+            // 성공 응답
             ResponseVO<Void> response = ResponseVO.<Void>builder()
-                                      .httpStatus(HttpStatus.OK)
-                                      .message("교육 과정이 성공적으로 수정되었습니다.")
-                                      .build();
+                    .httpStatus(HttpStatus.OK)
+                    .message("교육 과정이 성공적으로 수정되었습니다.")
+                    .status(true)  // 성공 상태 추가
+                    .build();
             return new ResponseEntity<>(response, response.getHttpStatus());
         } catch (Exception e) {
+            // 오류 발생 시 로그 출력
             LOGGER.error("교육 과정 수정 중 오류 발생", e);
+
+            // 실패 응답
             ResponseVO<Void> response = ResponseVO.<Void>builder()
-                                      .httpStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-                                      .message("수정 중 오류가 발생했습니다.")
-                                      .build();
+                    .httpStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .message("수정 중 오류가 발생했습니다.")
+                    .status(false)  // 실패 상태 추가
+                    .build();
             return new ResponseEntity<>(response, response.getHttpStatus());
         }
     }
@@ -163,5 +180,7 @@ public class EducationController {
             return new ResponseEntity<>(response, response.getHttpStatus());
         }
     }
+
+
 
 }

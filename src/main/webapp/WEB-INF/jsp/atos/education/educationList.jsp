@@ -22,7 +22,7 @@
     <form id="searchForm" name="searchForm" action="<c:url value='/admin/education/educationList'/>" method="get">
         <input type="hidden" name="pageIndex" value="${educationSearchVO.pageIndex}">
 
-        <div class="table-section">
+  
 
 <!-- 검색 조건 섹션 -->
         <div class="table-section">
@@ -69,7 +69,7 @@
                 <div>
                     <button class="btn-create-course" id="statusUpdateBtn">상태변경</button>
                     <button class="btn-excel" id="excelDownloadBtn">EXCEL</button>
-                    <button class="btn-create-course" onclick="location.href='<c:url value='/admin/education/educationRegistView' />'">과정등록</button>
+                    <button class="btn-create-course" id="registerCourseBtn">과정등록</button>
                 </div>
             </div>
 
@@ -96,7 +96,7 @@
                                 <td>
                                     ${resultInfo.mainName}<c:if test="${resultInfo.subName != null && !resultInfo.subName.isEmpty()}"> > ${resultInfo.subName}</c:if>
                                 </td>
-                                <td><a href="<c:url value='/admin/education/educationDetail.do?eduCode=${resultInfo.eduCode}'/>">${resultInfo.title}</a></td>
+                                <td><a href="<c:url value='/admin/education/educationDetail?eduCode=${resultInfo.eduCode}'/>">${resultInfo.title}</a></td>
                                 <td><c:out value="${resultInfo.trainingTime}" /></td>
                                 <td><c:out value="${resultInfo.register}" /></td>
                                 <td><c:out value="${resultInfo.statusName}" /></td>
@@ -121,7 +121,11 @@
         </div>
     </form>
 
+
 </div>
+
+
+
 
 
 
@@ -136,12 +140,12 @@
       <div class="modal-body" id="modalContent">
         <!-- 교육중 상태 -->
         <div class="form-check">
-            <input class="form-check-input" type="radio" name="statusRadio" id="status1" value="1002" checked>
+            <input class="form-check-input" type="radio" name="statusRadio" id="status1" value="4001" checked>
             <label class="form-check-label" for="status1">교육중</label>
         </div>
         <!-- 폐강 상태 -->
         <div class="form-check">
-            <input class="form-check-input" type="radio" name="statusRadio" id="status2" value="1001">
+            <input class="form-check-input" type="radio" name="statusRadio" id="status2" value="4002">
             <label class="form-check-label" for="status2">폐강</label>
         </div>
       </div>
@@ -155,7 +159,6 @@
 
 
 
-</div>
 
 
 
@@ -166,19 +169,24 @@ $(document).ready(function() {
         $('tbody input[name="rowCheck"]').prop('checked', this.checked);
     });
 
-    // 상태변경 버튼 클릭 시
-    $('#statusUpdateBtn').on('click', function() {
-        var selectedEduCode = [];
-        $('input[name="rowCheck"]:checked').each(function() {
-            selectedEduCode.push($(this).val());
+
+    // 상태변경 버튼 클릭 시 모달 열기
+    $('#statusUpdateBtn').on('click', function(event) {
+        event.preventDefault(); // 기본 폼 제출 방지
+
+        var selectedEduCodes = [];
+        $('tbody input[name="rowCheck"]:checked').each(function() {
+            selectedEduCodes.push($(this).val());
         });
 
-        if (selectedEduCode.length > 0) {
-            $('#statusModal').modal('show');
+        if (selectedEduCodes.length > 0) {
+            // 선택된 교육 코드가 있는 경우에만 모달을 띄움
+            $('#statusModal').data('eduCodes', selectedEduCodes).modal('show');
         } else {
-            alert("선택된 항목이 없습니다.");
+            alert("상태를 변경할 교육 과정을 선택해주세요.");
         }
     });
+
 
     // 상태변경 확인 버튼 클릭 시
     $('#confirmStatusChangeBtn').on('click', function() {
@@ -219,5 +227,12 @@ $(document).ready(function() {
     $('#excelDownloadBtn').on('click', function() {
         $('#searchForm').attr('action', '/admin/education/educationListExcelDown').submit();
     });
+
+     // 과정 등록 버튼 클릭 시 등록 페이지로 이동
+    $('#registerCourseBtn').on('click', function(event){
+    event.preventDefault(); // 기본 동작 방지
+    window.location.href = "<c:url value='/admin/education/educationRegistView'/>";
+    });
+
 });
 </script>

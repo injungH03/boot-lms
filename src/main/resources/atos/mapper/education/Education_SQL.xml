@@ -6,7 +6,7 @@
 
 <sql id="whereClause">
         <trim prefix="WHERE" prefixOverrides="AND">
-            a.STATUS != '1005'  <!-- 기본 조건 -->
+            a.STATUS != '4002'  <!-- 기본 조건 -->
             AND d.USE_YN = 'Y'  <!-- 'USE_YN' 조건은 항상 포함 -->
             <if test="statusCode != null and statusCode != ''">
                 AND a.STATUS = #{statusCode}
@@ -109,7 +109,8 @@
             COMPLETION_CRITERIA,
             NOTE,
             TRAINING_TIME,
-            REGISTER  <!-- 등록자 추가 -->
+            REGISTER,
+            STATUS
         )
         VALUES(
             #{title},
@@ -119,7 +120,8 @@
             #{completionCriteria},
             #{note},
             #{trainingTime},
-            #{register}  <!-- 등록자 값 설정 -->
+            #{register},  <!-- 등록자 값 설정 -->
+            #{status}
         )
     </insert>
 
@@ -256,7 +258,7 @@
     <!-- 교육 상태 '삭제'로 변경 -->
     <update id="deleteEducationByEduCode">
         UPDATE ATOS_EDUCATION
-        SET STATUS = '1005'  <!-- '삭제' 상태로 변경 -->
+        SET STATUS = '4002'  <!-- '삭제' 상태로 변경 -->
         WHERE EDU_CODE = #{eduCode}
     </update>
 
