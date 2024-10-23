@@ -23,15 +23,15 @@
             </tr>
             <tr>
                 <th>비밀번호</th>
-                <td colspan="3"><input type="password" id="password" name="password" class="form-control me-2 widthAuto" placeholder="영문/숫자/특수문자5~15자리" required /></td>
+                <td colspan="3"><input type="password" id="password" name="password" class="form-control me-2 widthAuto" placeholder="영문/숫자/특수문자5~15자리" required maxlength="20"/></td>
             </tr>
             <tr>
                 <th>비밀번호확인</th>
-                <td colspan="3"><input type="password" id="confirmPassword" name="confirmPassword" class="form-control me-2 widthAuto" placeholder="영문/숫자/특수문자5~15자리" required /></td>
+                <td colspan="3"><input type="password" id="confirmPassword" name="confirmPassword" class="form-control me-2 widthAuto" placeholder="영문/숫자/특수문자5~15자리" required maxlength="20"/></td>
             </tr>
             <tr>
                 <th>이름</th>
-                <td><input type="text" name="name" value="${member.name }" class="form-control me-2 widthAuto"/></td>
+                <td><input type="text" name="name" value="${member.name }" class="form-control me-2 widthAuto" maxlength="10"/></td>
                 <th>생년월일</th>
                 <td><input type="date" name="birthdate" value="${member.birthdate }" class="form-control me-2 widthAuto" /></td>
             </tr>
@@ -39,14 +39,14 @@
                 <th>전화번호</th>
                 <td><input type="text" name="phoneNo" value="${member.phoneNo }" class="form-control me-2 widthAuto" /></td>
                 <th>이메일</th>
-                <td><input type="email" name="email" value="${member.email }"class="form-control me-2 widthAuto"  /></td>
+                <td><input type="email" name="email" value="${member.email }"class="form-control me-2 widthAuto" maxlength="20" /></td>
  
             </tr>
             <tr>
                 <th>소속부서</th>
-                <td><input type="text" name="department" value="${member.department }" class="form-control me-2 widthAuto" /></td>
+                <td><input type="text" name="department" value="${member.department }" class="form-control me-2 widthAuto" maxlength="10" /></td>
                 <th>직책</th>
-                <td><input type="text" name="position" value="${member.position }" class="form-control me-2 widthAuto" /></td>
+                <td><input type="text" name="position" value="${member.position }" class="form-control me-2 widthAuto" maxlength="10" /></td>
             </tr>
             <tr>
                 <th>주소</th>
@@ -56,7 +56,7 @@
                         <button type="button" class="btn btn-sm btn-primary" id="addressSearchButton">주소 검색</button>
                     </div>
                     <input type="text" id="address" name="addr1" class="form-control mt-2 widthAuto" value="${member.addr1 }" placeholder="주소를 검색해주세요" readonly />
-                    <input type="text" id="detailedAddress" name="addr2" class="form-control mt-2" value="${member.addr2 }" placeholder="상세주소를 입력하세요" style="width:43%"/>
+                    <input type="text" id="detailedAddress" name="addr2" class="form-control mt-2" value="${member.addr2 }" placeholder="상세주소를 입력하세요" style="width:43%" maxlength="30" />
                 </td>
             </tr>
             <tr>

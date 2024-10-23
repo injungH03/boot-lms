@@ -41,6 +41,11 @@ public interface LectureDAO  {
 
 	List<LectureMemDTO> selectCompanyList();
 
+	List<LectureAttendExcelVO> selectAttendExcel(LectureAttendDTO lectureAttendDTO);
+
+	List<LectureExcelVO> selectLectureExcel(LectureVO lectureVO);
+
+
 	void insertLecture(LectureVO lectureVO);
 
 	void updateLecture(LectureVO lectureVO);

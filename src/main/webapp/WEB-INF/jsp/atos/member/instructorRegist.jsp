@@ -20,20 +20,20 @@
             <tr>
                 <th>아이디</th>
                 <td colspan="3">
-                    <input type="text" name="id" id="userId" class="form-control me-2 widthAuto" />
+                    <input type="text" name="id" id="userId" class="form-control me-2 widthAuto" maxlength="20" />
                 </td>
             </tr>
             <tr>
                 <th>비밀번호</th>
-                <td colspan="3"><input type="password" id="password" name="password" class="form-control me-2 widthAuto" placeholder="영문/숫자/특수문자5~15자리" required /></td>
+                <td colspan="3"><input type="password" id="password" name="password" class="form-control me-2 widthAuto" placeholder="영문/숫자/특수문자5~15자리" required maxlength="20" /></td>
             </tr>
             <tr>
                 <th>비밀번호확인</th>
-                <td colspan="3"><input type="password" id="confirmPassword" name="confirmPassword" class="form-control me-2 widthAuto" placeholder="영문/숫자/특수문자5~15자리" required /></td>
+                <td colspan="3"><input type="password" id="confirmPassword" name="confirmPassword" class="form-control me-2 widthAuto" placeholder="영문/숫자/특수문자5~15자리" required maxlength="20" /></td>
             </tr>
             <tr>
                 <th>이름</th>
-                <td><input type="text" name="name"  class="form-control me-2 widthAuto"/></td>
+                <td><input type="text" name="name"  class="form-control me-2 widthAuto" maxlength="10"/></td>
                 <th>생년월일</th>
                 <td><input type="date" name="birthdate"  class="form-control me-2 widthAuto" /></td>
             </tr>
@@ -41,18 +41,18 @@
                 <th>전화번호</th>
                 <td><input type="text" name="phoneNo"  class="form-control me-2 widthAuto" /></td>
                 <th>이메일</th>
-                <td><input type="email" name="email" class="form-control me-2 widthAuto"  /></td>
+                <td><input type="email" name="email" class="form-control me-2 widthAuto" maxlength="20" /></td>
  
             </tr>
             <tr>
                 <th>소속부서</th>
-                <td><input type="text" name="department"  class="form-control me-2 widthAuto" /></td>
+                <td><input type="text" name="department"  class="form-control me-2 widthAuto" maxlength="10" /></td>
                 <th>직책</th>
-                <td><input type="text" name="position" class="form-control me-2 widthAuto" /></td>
+                <td><input type="text" name="position" class="form-control me-2 widthAuto" maxlength="10" /></td>
             </tr>
             <tr>
                 <th>직업</th>
-                <td colspan="3"><input type="text" name="job" class="form-control me-2 widthAuto"  /></td>
+                <td colspan="3"><input type="text" name="job" class="form-control me-2 widthAuto" maxlength="10" /></td>
             </tr>
             <tr>
                 <th>주소</th>
@@ -62,7 +62,7 @@
                         <button type="button" class="btn btn-sm btn-primary" id="addressSearchButton">주소 검색</button>
                     </div>
                     <input type="text" id="address" name="addr1" class="form-control mt-2 widthAuto"  placeholder="주소를 검색해주세요" readonly />
-                    <input type="text" id="detailedAddress" name="addr2" class="form-control mt-2"  placeholder="상세주소를 입력하세요" style="width:43%"/>
+                    <input type="text" id="detailedAddress" name="addr2" class="form-control mt-2"  placeholder="상세주소를 입력하세요" style="width:43%" maxlength="30" />
                 </td>
             </tr>
             <tr>

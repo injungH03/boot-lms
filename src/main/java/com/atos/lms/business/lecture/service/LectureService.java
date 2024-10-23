@@ -1,11 +1,16 @@
 package com.atos.lms.business.lecture.service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.atos.lms.business.lecture.model.*;
+import com.atos.lms.business.member.model.MemberVO;
+import com.atos.lms.common.utl.ExcelUtil;
 import com.atos.lms.common.utl.SortFieldValidator;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -283,7 +288,10 @@ public class LectureService  {
 
 		if ("S".equals(lectureAttendDTO.getType())) {
 			// 출석
+			String currentDate = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+
 			lectureAttendDTO.setStatus("출석");
+			lectureAttendDTO.setAttendDate(currentDate);
 			lectureDao.updateAttend(lectureAttendDTO);
 
 			return "출석 완료";
@@ -293,6 +301,7 @@ public class LectureService  {
 			lectureAttendDTO.setStatus("결석");
 			lectureAttendDTO.setInTime(null);
 			lectureAttendDTO.setOutTime(null);
+			lectureAttendDTO.setAttendDate(null);
 			lectureDao.updateAttend(lectureAttendDTO);
 
 			return "결석 완료";
@@ -312,6 +321,46 @@ public class LectureService  {
 		return "접근 오류";
 	}
 
+	public void attendListExcelDown(HttpServletResponse response, LectureAttendDTO lectureAttendDTO) throws Exception {
+		LectureVO lectureVO = lectureDao.selectLectureOne(lectureAttendDTO.getLectureCode());
+
+		List<LectureAttendExcelVO> list = lectureDao.selectAttendExcel(lectureAttendDTO);
+
+		Map<String, String> fieldToHeaderMap = new HashMap<>();
+		fieldToHeaderMap.put("corpName", "업체명");
+		fieldToHeaderMap.put("memberId", "아이디");
+		fieldToHeaderMap.put("name", "이름");
+		fieldToHeaderMap.put("inTimeFormat", "입실시간");
+		fieldToHeaderMap.put("outTimeFormat", "퇴실시간");
+		fieldToHeaderMap.put("status", "출석여부");
+		fieldToHeaderMap.put("attendDate", "출석날짜");
+
+		ExcelUtil.exportToExcel(response, list, "출석부", lectureVO.getTitle() + "출석부", fieldToHeaderMap);
+
+	}
+	//lectureListExcelDown
+	public void lectureListExcelDown(HttpServletResponse response, LectureVO lectureVO) throws Exception {
+
+		List<LectureExcelVO> list = lectureDao.selectLectureExcel(lectureVO);
+
+		Map<String, String> fieldToHeaderMap = new HashMap<>();
+		fieldToHeaderMap.put("title", "과정명");
+		fieldToHeaderMap.put("mainName", "분류");
+		fieldToHeaderMap.put("subName", "세부분류");
+		fieldToHeaderMap.put("instructorName", "강사명");
+		fieldToHeaderMap.put("trainingTime", "교육시간");
+		fieldToHeaderMap.put("enrolled", "수강생수");
+		fieldToHeaderMap.put("capacity", "수강정원");
+		fieldToHeaderMap.put("learnDate", "과정날짜");
+		fieldToHeaderMap.put("recStartDate", "접수시작일");
+		fieldToHeaderMap.put("recEndDate", "접수종료일");
+		fieldToHeaderMap.put("manager", "담당자");
+		fieldToHeaderMap.put("managerContact", "담당자 연락처");
+		fieldToHeaderMap.put("location", "과정 위치");
+
+		ExcelUtil.exportToExcel(response, list, "출석부", "집합과정운영목록", fieldToHeaderMap);
+
+	}
 
 
 }

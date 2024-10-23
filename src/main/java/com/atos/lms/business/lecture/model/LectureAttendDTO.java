@@ -24,6 +24,8 @@ public class LectureAttendDTO extends LectureMasterVO {
     private String inTimeFormat;
     private String outTimeFormat;
 
+    private String title;
+
     private int lectureCode; // 공용 파라미터
     private List<Integer> attendCodeList;
 

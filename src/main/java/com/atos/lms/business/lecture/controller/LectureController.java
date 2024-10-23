@@ -13,6 +13,7 @@ import com.atos.lms.common.model.ResponseVO;
 import com.atos.lms.common.service.CategoryService;
 import com.atos.lms.common.utl.PaginationInfo;
 import com.atos.lms.common.utl.ResponseHelper;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -387,6 +388,19 @@ public class LectureController {
 	    }
 
         return new ResponseEntity<>(response, response.getHttpStatus());
+	}
+	@RequestMapping("/attendListExcelDown")
+	public void attendListExcelDown(HttpServletResponse response, LectureAttendDTO lectureAttendDTO) throws Exception {
+		System.out.println("엑셀 다운................ ");
+		lectureService.attendListExcelDown(response, lectureAttendDTO);
+
+	}
+
+	@RequestMapping("/lectureListExcelDown")
+	public void lectureListExcelDown(HttpServletResponse response, LectureVO lectureVO) throws Exception {
+		System.out.println("엑셀 다운................ ");
+		lectureService.lectureListExcelDown(response, lectureVO);
+
 	}
 
 }
