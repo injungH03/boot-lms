@@ -4,15 +4,13 @@
 
 <mapper namespace="com.atos.lms.business.attendance.service.AllAttendanceDAO">
 
-   <!-- 조건에 따른 동적 WHERE 절 구성 -->
+    <!-- 조건에 따른 동적 WHERE 절 구성 -->
     <sql id="whereClause">
         <trim prefix="WHERE" prefixOverrides="AND">
-            <if test="true">
-               a.STATUS IS NULL OR a.STATUS != '4002'
-            </if>
-            <!-- 교육 코드(Education)에 해당하는 강의 코드 필터링 -->
+
+            <!-- 강의 코드(Lecture)에 해당하는 조건으로 필터링 -->
             <if test="lectureCode > 0">
-                AND l.LECTURE_CODE = #{lectureCode}
+                AND s.LECTURE_ID = #{lectureCode}
             </if>
             <!-- 출석일 범위 조건 추가 -->
             <if test="srcStartDate != null and srcStartDate != ''">
@@ -43,70 +41,80 @@
     </sql>
 
 
-
-<!-- 출석 목록 조회 쿼리 -->
-<select id="selectAttendanceList" parameterType="com.atos.lms.business.attendance.model.AllAttendanceVO"
-        resultType="com.atos.lms.business.attendance.model.AllAttendanceVO">
-    SELECT
+    <!-- 출석 목록 조회 쿼리 -->
+    <select id="selectAttendanceList" parameterType="com.atos.lms.business.attendance.model.AllAttendanceVO"
+            resultType="com.atos.lms.business.attendance.model.AllAttendanceVO">
+        SELECT
         a.ATTEND_CODE,        <!-- 출석 코드 -->
         a.ENROLL_ID,          <!-- 수강생 배정 코드 -->
         a.ATTEND_DATE,        <!-- 출석 날짜 -->
         a.IN_TIME,            <!-- 입실 시간 -->
         a.OUT_TIME,           <!-- 퇴실 시간 -->
-        a.STATUS AS statusName,<!-- 출석 상태명 바로 조회 -->
+        a.STATUS AS statusName,<!-- 출석 상태명 -->
         s.MEMBER_ID,          <!-- 수강생 ID -->
         m.NAME,               <!-- 수강생 이름 -->
-        c.CORP_NAME,          <!-- 회사명 (소속) -->
-        e.TITLE AS title      <!-- 강의명 (과정명) -->
-    FROM
+        c.CORP_NAME,          <!-- 소속 회사명 -->
+        e.TITLE AS title      <!-- 과정명 (교육명) -->
+        FROM
         ATOS_ATTENDANCE a
-    LEFT JOIN
+        INNER JOIN
         ATOS_ENROLLMENT s ON a.ENROLL_ID = s.ENROLL_CODE
-    LEFT JOIN
+        INNER JOIN
         ATOS_MEMBER m ON s.MEMBER_ID = m.ID
-    LEFT JOIN
+        LEFT JOIN
         ATOS_MEMBER_NOMAL mn ON m.ID = mn.MEMBER_ID   <!-- 회원 정보와 회사 정보 연결 -->
-    LEFT JOIN
+        LEFT JOIN
         ATOS_COMPANY c ON mn.BIZ_REG_NO = c.BIZ_REG_NO <!-- 회사 정보 연결 -->
-    LEFT JOIN
+        INNER JOIN
         ATOS_LECTURE l ON s.LECTURE_ID = l.LECTURE_CODE
-    LEFT JOIN
-        ATOS_EDUCATION e ON l.EDUCATION = e.EDU_CODE  <!-- 교육 정보 (강의명) -->
-    <include refid="whereClause"/>  <!-- 동적 WHERE 조건 추가 -->
-    ORDER BY
+        INNER JOIN
+        ATOS_EDUCATION e ON l.EDUCATION = e.EDU_CODE  <!-- 교육 정보 (과정명) -->
+        <include refid="whereClause"/>  <!-- 동적 WHERE 조건 추가 -->
+        ORDER BY
         a.ATTEND_CODE DESC
-    LIMIT
+        LIMIT
         #{recordCountPerPage} OFFSET #{firstIndex}
-</select>
+    </select>
 
 
-<!-- 출석 목록 총 개수 조회 쿼리 -->
-<select id="selectAttendanceListCnt" parameterType="com.atos.lms.business.attendance.model.AllAttendanceVO"
-        resultType="int">
-    SELECT COUNT(a.ATTEND_CODE)
-    FROM ATOS_ATTENDANCE a
-    JOIN ATOS_ENROLLMENT en ON a.ENROLL_ID = en.ENROLL_CODE
-    JOIN ATOS_MEMBER m ON en.MEMBER_ID = m.ID
-    JOIN ATOS_MEMBER_NOMAL mn ON m.ID = mn.MEMBER_ID       <!-- 회원 정보와 회사 정보 연결 -->
-    JOIN ATOS_COMPANY c ON mn.BIZ_REG_NO = c.BIZ_REG_NO    <!-- 회사 정보 연결 -->
-    JOIN ATOS_LECTURE l ON en.LECTURE_ID = l.LECTURE_CODE
-    <include refid="whereClause"/>                         <!-- 동적 WHERE 조건 포함 -->
-</select>
-
+    <!-- 출석 목록 총 개수 조회 쿼리 -->
+    <select id="selectAttendanceListCnt" parameterType="com.atos.lms.business.attendance.model.AllAttendanceVO"
+            resultType="int">
+        SELECT COUNT(a.ATTEND_CODE)
+        FROM ATOS_ATTENDANCE a
+        JOIN ATOS_ENROLLMENT s ON a.ENROLL_ID = s.ENROLL_CODE
+        JOIN ATOS_MEMBER m ON s.MEMBER_ID = m.ID
+        LEFT JOIN ATOS_MEMBER_NOMAL mn ON m.ID = mn.MEMBER_ID       <!-- 회원 정보와 회사 정보 연결 -->
+        LEFT JOIN ATOS_COMPANY c ON mn.BIZ_REG_NO = c.BIZ_REG_NO    <!-- 회사 정보 연결 -->
+        JOIN ATOS_LECTURE l ON s.LECTURE_ID = l.LECTURE_CODE
+        <include refid="whereClause"/>                         <!-- 동적 WHERE 조건 포함 -->
+    </select>
 
 
     <!-- 교육 목록 조회 -->
     <select id="selectEducationList" resultType="com.atos.lms.business.attendance.model.AllAttendanceVO">
-        SELECT EDU_CODE, TITLE
-        FROM ATOS_EDUCATION
-        WHERE STATUS != '4002'
+        SELECT
+            L.LECTURE_CODE,
+            E.TITLE
+        FROM
+            ATOS_LECTURE L
+        JOIN
+            ATOS_EDUCATION E
+        ON
+            L.EDUCATION = E.EDU_CODE
+        WHERE
+            L.STATUS != '4002'
     </select>
+
+
+
+
 
     <!-- 입실 시간 업데이트 -->
     <update id="updateCheckIn" parameterType="map">
         UPDATE ATOS_ATTENDANCE
         SET IN_TIME = #{inTime},
-            ATTEND_DATE = #{attendDate}
+        ATTEND_DATE = #{attendDate}
         WHERE ATTEND_CODE = #{attendCode}
     </update>
 
@@ -114,7 +122,7 @@
     <update id="updateCheckOut" parameterType="map">
         UPDATE ATOS_ATTENDANCE
         SET OUT_TIME = #{outTime},
-            STATUS = CASE WHEN IN_TIME IS NOT NULL THEN '출석' ELSE STATUS END
+        STATUS = CASE WHEN IN_TIME IS NOT NULL THEN '출석' ELSE STATUS END
         WHERE ATTEND_CODE = #{attendCode}
     </update>
 
@@ -130,7 +138,7 @@
     <update id="updateCheckInAll" parameterType="map">
         UPDATE ATOS_ATTENDANCE
         SET IN_TIME = #{inTime},
-            ATTEND_DATE = #{attendDate}
+        ATTEND_DATE = #{attendDate}
         WHERE ATTEND_CODE IN
         <foreach item="item" collection="attendCodes" open="(" separator="," close=")">
             #{item}
@@ -141,7 +149,7 @@
     <update id="updateCheckOutAll" parameterType="map">
         UPDATE ATOS_ATTENDANCE
         SET OUT_TIME = #{outTime},
-            STATUS = CASE WHEN IN_TIME IS NOT NULL THEN '출석' ELSE STATUS END
+        STATUS = CASE WHEN IN_TIME IS NOT NULL THEN '출석' ELSE STATUS END
         WHERE ATTEND_CODE IN
         <foreach item="item" collection="attendCodes" open="(" separator="," close=")">
             #{item}
@@ -152,9 +160,9 @@
     <update id="updateAllAbsence" parameterType="list">
         UPDATE ATOS_ATTENDANCE
         SET STATUS = '결석',
-            IN_TIME = NULL,
-            OUT_TIME = NULL,
-            ATTEND_DATE = NULL
+        IN_TIME = NULL,
+        OUT_TIME = NULL,
+        ATTEND_DATE = NULL
         WHERE ATTEND_CODE IN
         <foreach item="item" collection="list" open="(" separator="," close=")">
             #{item}
@@ -164,33 +172,32 @@
     <!-- 엑셀 다운로드를 위한 출석 목록 조회 쿼리 -->
     <select id="selectAttendanceListForExcel" resultType="com.atos.lms.business.attendance.model.AllAttendanceExcelVO">
         SELECT
-            c.CORP_NAME AS corpName,
-            e.TITLE AS title,
-            s.MEMBER_ID AS enrollId,
-            m.NAME AS name,
-            d.NAME AS status,
-            a.ATTEND_DATE AS attendDate,
-            a.IN_TIME AS inTime,
-            a.OUT_TIME AS outTime
+        c.CORP_NAME AS corpName,
+        e.TITLE AS title,
+        s.MEMBER_ID AS enrollId,
+        m.NAME AS name,
+        d.NAME AS status,
+        a.ATTEND_DATE AS attendDate,
+        a.IN_TIME AS inTime,
+        a.OUT_TIME AS outTime
         FROM
-            ATOS_ATTENDANCE a
+        ATOS_ATTENDANCE a
         LEFT JOIN
-            ATOS_ENROLLMENT s ON a.ENROLL_ID = s.ENROLL_CODE
+        ATOS_ENROLLMENT s ON a.ENROLL_ID = s.ENROLL_CODE
         LEFT JOIN
-            ATOS_MEMBER m ON s.MEMBER_ID = m.ID
+        ATOS_MEMBER m ON s.MEMBER_ID = m.ID
         LEFT JOIN
-            ATOS_COMPANY c ON m.BIZ_REG_NO = c.BIZ_REG_NO
+        ATOS_COMPANY c ON m.BIZ_REG_NO = c.BIZ_REG_NO
         LEFT JOIN
-            ATOS_LECTURE l ON s.LECTURE_ID = l.LECTURE_CODE
+        ATOS_LECTURE l ON s.LECTURE_ID = l.LECTURE_CODE
         LEFT JOIN
-            ATOS_EDUCATION e ON l.EDUCATION = e.EDU_CODE
+        ATOS_EDUCATION e ON l.EDUCATION = e.EDU_CODE
         LEFT JOIN
-            ATOS_STATUS d ON a.STATUS = d.CODE
+        ATOS_STATUS d ON a.STATUS = d.CODE
         <include refid="whereClause"/>
         ORDER BY
-            a.ATTEND_CODE DESC
+        a.ATTEND_CODE DESC
     </select>
-
 
 
 </mapper>

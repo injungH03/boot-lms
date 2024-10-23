@@ -32,8 +32,11 @@ public interface AllAttendanceDAO {
 
     void updateAllAbsence(List<Integer> attendCodes);
 
-    // 엑셀 다운로드용 출석 목록 조회
-    List<AllAttendanceVO> selectAttendanceListForExcel(AllAttendanceVO attendanceVO);
+/*
 
+    // 엑셀 다운로드용 출석 목록 조회
+    List<AllAttendanceVO> selectAttendanceListForExcel(HttpServletResponse response, AllAttendanceVO attendanceVO);
+
+*/
 
 }

@@ -6,7 +6,9 @@
 
 <sql id="whereClause">
         <trim prefix="WHERE" prefixOverrides="AND">
-            a.STATUS != '4002'  <!-- 기본 조건 -->
+<!--
+            a.STATUS != '4002'  &lt;!&ndash; 기본 조건 &ndash;&gt;
+            -->
             AND d.USE_YN = 'Y'  <!-- 'USE_YN' 조건은 항상 포함 -->
             <if test="statusCode != null and statusCode != ''">
                 AND a.STATUS = #{statusCode}

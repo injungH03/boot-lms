@@ -5,7 +5,6 @@ import com.atos.lms.business.attendance.model.AllAttendanceVO;
 import com.atos.lms.business.attendance.service.AllAttendanceService;
 import com.atos.lms.common.utl.PaginationInfo;
 import com.atos.lms.common.utl.ResponseHelper;
-import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +20,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin/education")
@@ -42,6 +42,7 @@ public class AllAttendanceController {
 
         // 페이징 처리 설정
         PaginationInfo paginationInfo = new PaginationInfo();
+
         paginationInfo.setCurrentPageNo(attendanceVO.getPageIndex());
         paginationInfo.setRecordCountPerPage(attendanceVO.getPageUnit());
         paginationInfo.setPageSize(attendanceVO.getPageSize());
@@ -50,12 +51,22 @@ public class AllAttendanceController {
         attendanceVO.setLastIndex(paginationInfo.getLastRecordIndex());
         attendanceVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
 
+        // 전달된 lectureCode가 올바르게 들어왔는지 로그로 확인
+        LOGGER.info("Selected lectureCode: " + attendanceVO.getLectureCode());
+
+        LOGGER.info("Search parameters - lectureCode: {}, startDate: {}, endDate: {}, searchCnd: {}, searchWrd: {}",
+                attendanceVO.getLectureCode(), attendanceVO.getSrcStartDate(), attendanceVO.getSrcEndDate(),
+                attendanceVO.getSearchCnd(), attendanceVO.getSearchWrd());
+
+
         // 출석 목록 조회 및 교육 목록 조회
         Map<String, Object> map = allAttendanceService.selectAttendanceList(attendanceVO);
+
         List<AllAttendanceVO> educationList = allAttendanceService.selectEducationList();
 
         // 총 레코드 수 설정
         int totalCount = Integer.parseInt(String.valueOf(map.get("resultCnt")));
+
         paginationInfo.setTotalRecordCount(totalCount);
 
         // 모델에 데이터 추가
@@ -103,7 +114,7 @@ public class AllAttendanceController {
             for (Integer attendCode : attendCodes) {
                 AllAttendanceVO attendanceVO = allAttendanceService.selectAttendanceByCode(attendCode);
                 if (attendanceVO.getInTime() == null) {
-                    return ResponseEntity.status(400).body(ResponseHelper.error("400", "입실 처리되지 않은 출석 코드", HttpStatus.BAD_REQUEST, null));
+                    return ResponseEntity.status(400).body(ResponseHelper.error("400", "입실 처리가 되지 않았습니다", HttpStatus.BAD_REQUEST, null));
                 }
             }
 
@@ -132,18 +143,47 @@ public class AllAttendanceController {
         }
     }
 
-    // 전체 퇴실 처리
-    @RequestMapping("/checkOutAll")
-    @ResponseBody
-    public ResponseEntity<?> checkOutAll(@RequestBody Map<String, Object> requestData) {
-        try {
-            allAttendanceService.updateCheckOutAll(requestData);
-            return ResponseEntity.ok(ResponseHelper.successWithResult("전체 퇴실 처리 완료", null));
-        } catch (Exception e) {
-            LOGGER.error("전체 퇴실 처리 실패", e);
-            return ResponseEntity.status(500).body(ResponseHelper.error("500", "전체 퇴실 처리 실패", HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage()));
+
+// 전체 퇴실 처리
+@RequestMapping("/checkOutAll")
+@ResponseBody
+public ResponseEntity<?> checkOutAll(@RequestBody Map<String, Object> requestData) {
+    try {
+        // attendCodes가 String 타입으로 전달될 수 있으므로 Integer로 변환
+        List<String> attendCodesStr = (List<String>) requestData.get("attendCodes");
+        List<Integer> attendCodes = attendCodesStr.stream().map(Integer::parseInt).collect(Collectors.toList());
+
+        // 클라이언트에서 전송된 outTime을 사용
+        String outTimeStr = (String) requestData.get("outTime");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+
+        // 입력받은 outTime을 LocalTime으로 변환
+        LocalTime outTime = LocalTime.parse(outTimeStr, formatter);
+
+        // 입실 여부 확인
+        for (Integer attendCode : attendCodes) {
+            AllAttendanceVO attendanceVO = allAttendanceService.selectAttendanceByCode(attendCode);
+            if (attendanceVO.getInTime() == null) {
+                return ResponseEntity.status(400).body(ResponseHelper.error("400", "입실 처리가 되지 않았습니다", HttpStatus.BAD_REQUEST, null));
+            }
         }
+
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("attendCodes", attendCodes);
+        paramMap.put("outTime", outTime.format(formatter)); // 전송된 퇴실 시간을 그대로 사용
+
+        // 전체 퇴실 처리 업데이트
+        allAttendanceService.updateCheckOutAll(paramMap);
+
+        // 성공 시에도 status를 포함한 JSON 응답 반환
+        return ResponseEntity.ok(ResponseHelper.successWithResult("전체 퇴실 처리 완료", null));
+    } catch (Exception e) {
+        LOGGER.error("전체 퇴실 처리 실패", e);
+        return ResponseEntity.status(500).body(ResponseHelper.error("500", "전체 퇴실 처리 실패", HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage()));
     }
+}
+
+
 
     // 결석 처리
     @RequestMapping("/allAbsence")
@@ -159,6 +199,7 @@ public class AllAttendanceController {
         }
     }
 
+/*
 
     // 출석 목록 엑셀 다운로드
     @RequestMapping("/attendanceExcelDownload")
@@ -166,5 +207,6 @@ public class AllAttendanceController {
         allAttendanceService.attendanceListExcelDown(response, attendanceVO);
     }
 
+*/
 
 }

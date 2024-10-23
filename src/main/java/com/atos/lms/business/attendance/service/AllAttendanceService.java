@@ -2,9 +2,7 @@ package com.atos.lms.business.attendance.service;
 
 
 import com.atos.lms.business.attendance.model.AllAttendanceVO;
-import com.atos.lms.common.utl.ExcelUtil;
 import com.atos.lms.common.utl.SortFieldValidator;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,6 +75,8 @@ public class AllAttendanceService {
         allAttendanceDAO.updateAllAbsence(attendCodes);
     }
 
+/*
+
     // 엑셀 다운로드
     @Transactional
     public void attendanceListExcelDown(HttpServletResponse response, AllAttendanceVO attendanceVO) throws Exception {
@@ -98,4 +98,9 @@ public class AllAttendanceService {
         // ExcelUtil을 사용하여 엑셀 파일을 생성하고 다운로드합니다.
         ExcelUtil.exportToExcel(response, attendanceList, "출석 목록", "attendance_list", fieldToHeaderMap);
     }
+
+
+*/
+
+
 }
