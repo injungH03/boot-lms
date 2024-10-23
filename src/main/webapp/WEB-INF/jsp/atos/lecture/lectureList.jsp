@@ -73,7 +73,7 @@
     </div>
     <div>
         <button type="button" class="btn-create-course" id="regist">과정개설</button>
-        <button type="button" class="btn-excel">EXCEL</button>
+        <button type="button" class="btn-excel" id="excelDown">EXCEL</button>
     </div>
 </div>
 
@@ -194,6 +194,17 @@ $(document).ready(function() {
 
         // form 전송
         $('#searchForm').submit();
+    });
+
+    $('#excelDown').on('click', function() {
+        const searchForm = $('#searchForm');
+        const originalAction = searchForm.attr('action');
+
+        searchForm.attr('action', '/admin/education/lectureListExcelDown');
+
+        searchForm.submit();
+
+        searchForm.attr('action', originalAction);
     });
     
     var initialSortField = '${searchVO.sortField}';

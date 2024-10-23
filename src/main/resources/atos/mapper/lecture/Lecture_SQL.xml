@@ -87,6 +87,9 @@
 	</sql>
 	<sql id="whereEnroll">
 		<where>
+			<if test="lectureCode > 0">
+				AND EN.LECTURE_ID = #{lectureCode}
+			</if>
 			<if test="srcLearnDate != null and srcLearnDate !=''">
 				AND L.LEARN_DATE = #{srcLearnDate}
 			</if>
@@ -445,6 +448,58 @@
 	    </foreach>
 	</select>
 
+	<select id="selectAttendExcel" resultType="com.atos.lms.business.lecture.model.LectureAttendExcelVO">
+		SELECT
+			C.CORP_NAME, E.MEMBER_ID, M.NAME,
+				CONCAT(
+					CASE
+					WHEN TIME_FORMAT(A.IN_TIME, '%p') = 'AM' THEN '오전 '
+					ELSE '오후 '
+					END,
+					TIME_FORMAT(A.IN_TIME, '%h:%i')
+				) AS inTimeFormat,
+				CONCAT(
+					CASE
+					WHEN TIME_FORMAT(A.OUT_TIME, '%p') = 'AM' THEN '오전 '
+					ELSE '오후 '
+					END,
+					TIME_FORMAT(A.OUT_TIME, '%h:%i')
+				) AS outTimeFormat,
+			A.ATTEND_DATE, A.STATUS
+		FROM ATOS_ATTENDANCE A
+		INNER JOIN ATOS_ENROLLMENT E
+		ON A.ENROLL_ID = E.ENROLL_CODE
+		INNER JOIN ATOS_MEMBER M
+		ON E.MEMBER_ID = M.ID
+		INNER JOIN ATOS_MEMBER_NOMAL N
+		ON N.MEMBER_ID = M.ID
+		INNER JOIN ATOS_COMPANY C
+		ON N.BIZ_REG_NO = C.BIZ_REG_NO
+		WHERE E.LECTURE_ID = #{lectureCode}
+	</select>
+
+	<select id="selectLectureExcel" resultType="com.atos.lms.business.lecture.model.LectureExcelVO">
+		SELECT
+			E.TITLE, CM.MAIN_NAME, CS.SUB_NAME,
+			I.NAME AS instructorName,
+			E.TRAINING_TIME, L.ENROLLED, L.CAPACITY, L.LEARN_DATE,
+			DATE_FORMAT(L.REC_START_DATE, '%Y-%m-%d') AS recStartDate,
+			DATE_FORMAT(L.REC_END_DATE, '%Y-%m-%d') AS recEndDate,
+			L.MANAGER, L.MANAGER_CONTACT, L.LOCATION
+		FROM ATOS_LECTURE L
+		INNER JOIN ATOS_EDUCATION E
+			ON L.EDUCATION = E.EDU_CODE
+		LEFT JOIN ATOS_MEMBER I
+			ON L.INSTRUCTOR = I.ID
+		INNER JOIN ATOS_CATEGORY_DETAIL CD
+			ON E.CATEGORY = CD.CODE
+		INNER JOIN ATOS_CATEGORY_MAIN CM
+			ON CD.MAIN_CODE = CM.MAIN_CODE
+		INNER JOIN ATOS_CATEGORY_SUB CS
+			ON CD.SUB_CODE = CS.SUB_CODE AND CD.MAIN_CODE = CS.MAIN_CODE
+		<include refid="whereClause" />
+
+	</select>
 
 
 	<insert id="insertLecture">
@@ -571,7 +626,7 @@
 		SET
 			IN_TIME = #{inTime},
 			OUT_TIME = #{outTime},
-			ATTEND_DATE = NOW(),
+			ATTEND_DATE = #{attendDate},
 			STATUS = #{status}
 		WHERE ATTEND_CODE = #{attendCode}
 	</update>

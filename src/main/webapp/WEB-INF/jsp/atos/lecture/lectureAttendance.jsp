@@ -15,7 +15,7 @@
 </div>
 <div class="table-section">
 	<%@ include file="/WEB-INF/jsp/atos/common/menutab.jsp" %>
-    <form id="searchForm" name="searchForm" action="<c:url value='/admin/education/lectureAttendList'/>" method="get">
+    <form id="searchForm" name="searchForm" action="<c:url value='/admin/education/lectureAttendance'/>" method="get">
         <table class="search-table">
             <tr>
                 <th>검색</th>
@@ -45,13 +45,13 @@
     </div>
     <div>
     	<button class="btn-create-course" id="attendAllCheck">출석</button>
-        <button class="btn-excel">EXCEL</button>
+        <button class="btn-excel" id="excelDown">EXCEL</button>
     </div>
 </div>
 
 <!-- 과정 테이블 섹션 -->
 <div class="course-table-section">
-    <table class="table table-bordered">
+    <table class="table table-bordered" id="attendTable">
        <colgroup>
 	        <col style="width: 5%;">
 	        <col style="width: 15%;">
@@ -66,12 +66,12 @@
         <thead>
             <tr>
                 <th>No</th>
-                <th>소속</th>
-                <th>아이디</th>
-                <th>이름</th>
-                <th>상태</th>
-                <th>입실시간</th>
-                <th>퇴실시간</th>
+                <th data-sort="C.CORP_NAME">소속</th>
+                <th data-sort="E.MEMBER_ID">아이디</th>
+                <th data-sort="M.NAME">이름</th>
+                <th data-sort="A.STATUS">상태</th>
+                <th data-sort="A.IN_TIME">입실시간</th>
+                <th data-sort="A.OUT_TIME">퇴실시간</th>
                 <th>관리</th>
                 <th><input type="checkbox" id="checkAll"></th>
             </tr>
@@ -277,6 +277,22 @@ $(document).ready(function() {
             }
         });
     });
+
+    $('#excelDown').on('click', function() {
+        const searchForm = $('#searchForm');
+        const originalAction = searchForm.attr('action');
+
+        searchForm.attr('action', '/admin/education/attendListExcelDown');
+
+        searchForm.submit();
+
+        searchForm.attr('action', originalAction);
+    });
+
+    var initialSortField = '${searchVO.sortField}';
+    var initialSortOrder = '${searchVO.sortOrder}';
+
+    handleSort('#attendTable', '#searchForm', initialSortField, initialSortOrder);
 
 });
 </script>

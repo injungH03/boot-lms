@@ -30,7 +30,7 @@
                 <td colspan="3">
 				<div>
                     <input type="text" id="address" name="location" class="form-control me-2 custom-width" placeholder="주소를 검색해주세요" readonly /><br />
-                    <input type="text"id="detailedAddress" name="locationDetail" class="form-control mt-2 custom-width" placeholder="상세주소를 입력하세요" />
+                    <input type="text"id="detailedAddress" name="locationDetail" class="form-control mt-2 custom-width" placeholder="상세주소를 입력하세요" maxlength="30" />
                 </div>
                 <div class="mt-2">
                     <button type="button" class="btn btn-sm btn-primary" id="addressSearchButton">주소검색</button>
@@ -75,7 +75,7 @@
             </tr>
             <tr>
             	<th>담당자</th>
-            	<td><input type="text" name="manager" class="form-control custom-width" placeholder="담당자를 입력하세요" /></td>
+            	<td><input type="text" name="manager" class="form-control custom-width" placeholder="담당자를 입력하세요" maxlength="10" /></td>
                 <th>연락처</th>
             	<td><input type="text" name="managerContact" class="form-control custom-width" placeholder="연락처를 입력하세요" /></td>
             </tr>

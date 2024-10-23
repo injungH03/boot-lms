@@ -70,7 +70,6 @@
     <div>
     	<button class="btn-create-course" id="studentAdd">수강생추가</button>
         <button class="btn-del" id="allDelete">삭제</button>
-        <button class="btn-excel">EXCEL</button>
     </div>
 </div>
 
