@@ -19,5 +19,9 @@ public class AllAttendanceMasterVO extends MasterVO {
     /** 과정날짜 */
     private String srcLearnDate;
 
+    /** 강의상태 */
+    private String learnStatus;
+
+
 
 }

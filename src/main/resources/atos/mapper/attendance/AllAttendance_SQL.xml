@@ -25,12 +25,21 @@
             </if>
             <!-- 검색 조건 추가 -->
             <if test="searchCnd == null or searchCnd == ''">
-                AND (m.NAME LIKE CONCAT('%', #{searchWrd}, '%') OR c.CORP_NAME LIKE CONCAT('%', #{searchWrd}, '%'))
+                AND (
+                m.NAME LIKE CONCAT('%', #{searchWrd}, '%') OR
+                c.CORP_NAME LIKE CONCAT('%', #{searchWrd}, '%') OR
+                e.TITLE LIKE CONCAT('%', #{searchWrd}, '%') OR
+                l.LECTURE_TITLE LIKE CONCAT('%', #{searchWrd}, '%') OR
+                s.MEMBER_ID LIKE CONCAT('%', #{searchWrd}, '%')
+                )
             </if>
             <if test="searchCnd != null and searchCnd != ''">
                 <choose>
                     <when test="searchCnd == 0">
-                        AND m.NAME LIKE CONCAT('%', #{searchWrd}, '%')
+                        AND (
+                        m.NAME LIKE CONCAT('%', #{searchWrd}, '%') OR
+                        s.MEMBER_ID LIKE CONCAT('%', #{searchWrd}, '%')
+                        )
                     </when>
                     <when test="searchCnd == 1">
                         AND c.CORP_NAME LIKE CONCAT('%', #{searchWrd}, '%')
@@ -50,11 +59,19 @@
         a.ATTEND_DATE,        <!-- 출석 날짜 -->
         a.IN_TIME,            <!-- 입실 시간 -->
         a.OUT_TIME,           <!-- 퇴실 시간 -->
-        a.STATUS AS statusName,<!-- 출석 상태명 -->
+            CASE
+        WHEN a.STATUS IS NULL THEN '출석대기'   <!-- 상태 값이 NULL일 때 '출석대기'로 표시 -->
+        ELSE a.STATUS
+        END AS statusName,    <!-- 상태 값이 있으면 기존 값을 사용 -->
         s.MEMBER_ID,          <!-- 수강생 ID -->
         m.NAME,               <!-- 수강생 이름 -->
         c.CORP_NAME,          <!-- 소속 회사명 -->
-        e.TITLE AS title      <!-- 과정명 (교육명) -->
+        e.TITLE AS title,     <!-- 교육명 -->
+        l.LECTURE_TITLE,      <!-- 강의 제목 -->
+        CASE
+        WHEN L.LEARN_DATE >= CURDATE() THEN '진행중'
+        ELSE '종료'
+        END AS learnStatus   <!-- 강의 상태 -->
         FROM
         ATOS_ATTENDANCE a
         INNER JOIN
@@ -87,6 +104,7 @@
         LEFT JOIN ATOS_MEMBER_NOMAL mn ON m.ID = mn.MEMBER_ID       <!-- 회원 정보와 회사 정보 연결 -->
         LEFT JOIN ATOS_COMPANY c ON mn.BIZ_REG_NO = c.BIZ_REG_NO    <!-- 회사 정보 연결 -->
         JOIN ATOS_LECTURE l ON s.LECTURE_ID = l.LECTURE_CODE
+        JOIN ATOS_EDUCATION e ON l.EDUCATION = e.EDU_CODE
         <include refid="whereClause"/>                         <!-- 동적 WHERE 조건 포함 -->
     </select>
 
@@ -94,20 +112,18 @@
     <!-- 교육 목록 조회 -->
     <select id="selectEducationList" resultType="com.atos.lms.business.attendance.model.AllAttendanceVO">
         SELECT
-            L.LECTURE_CODE,
-            E.TITLE
+        L.LECTURE_CODE,
+        E.TITLE AS title,  <!-- 교육명 -->
+        L.LECTURE_TITLE             <!-- 강의 제목 -->
         FROM
-            ATOS_LECTURE L
+        ATOS_LECTURE L
         JOIN
-            ATOS_EDUCATION E
+        ATOS_EDUCATION E
         ON
-            L.EDUCATION = E.EDU_CODE
+        L.EDUCATION = E.EDU_CODE
         WHERE
-            L.STATUS != '4002'
+        L.STATUS != '4002'
     </select>
-
-
-
 
 
     <!-- 입실 시간 업데이트 -->
@@ -169,35 +185,44 @@
         </foreach>
     </update>
 
-    <!-- 엑셀 다운로드를 위한 출석 목록 조회 쿼리 -->
-    <select id="selectAttendanceListForExcel" resultType="com.atos.lms.business.attendance.model.AllAttendanceExcelVO">
-        SELECT
+
+<!-- 엑셀 다운로드 -->
+<select id="selectAttendanceExcelList" resultType="com.atos.lms.business.attendance.model.AllAttendanceExcelVO">
+    SELECT
+        ROW_NUMBER() OVER (ORDER BY a.ATTEND_CODE DESC) AS No,  <!-- 순서 번호 추가 -->
         c.CORP_NAME AS corpName,
         e.TITLE AS title,
-        s.MEMBER_ID AS enrollId,
+        l.LECTURE_TITLE AS lectureTitle,
+        s.MEMBER_ID AS memberId,
         m.NAME AS name,
-        d.NAME AS status,
+        a.STATUS AS status,
         a.ATTEND_DATE AS attendDate,
         a.IN_TIME AS inTime,
-        a.OUT_TIME AS outTime
-        FROM
+        a.OUT_TIME AS outTime,
+        CASE
+            WHEN l.LEARN_DATE >= CURDATE() THEN '진행중'
+            ELSE '종료'
+        END AS learnStatus
+    FROM
         ATOS_ATTENDANCE a
-        LEFT JOIN
+    INNER JOIN
         ATOS_ENROLLMENT s ON a.ENROLL_ID = s.ENROLL_CODE
-        LEFT JOIN
+    INNER JOIN
         ATOS_MEMBER m ON s.MEMBER_ID = m.ID
-        LEFT JOIN
-        ATOS_COMPANY c ON m.BIZ_REG_NO = c.BIZ_REG_NO
-        LEFT JOIN
+    LEFT JOIN
+        ATOS_MEMBER_NOMAL mn ON m.ID = mn.MEMBER_ID
+    LEFT JOIN
+        ATOS_COMPANY c ON mn.BIZ_REG_NO = c.BIZ_REG_NO
+    INNER JOIN
         ATOS_LECTURE l ON s.LECTURE_ID = l.LECTURE_CODE
-        LEFT JOIN
+    INNER JOIN
         ATOS_EDUCATION e ON l.EDUCATION = e.EDU_CODE
-        LEFT JOIN
-        ATOS_STATUS d ON a.STATUS = d.CODE
-        <include refid="whereClause"/>
-        ORDER BY
+    <include refid="whereClause"/>
+    ORDER BY
         a.ATTEND_CODE DESC
-    </select>
+</select>
+
+
 
 
 </mapper>

@@ -1,6 +1,7 @@
 package com.atos.lms.business.attendance.service;
 
 
+import com.atos.lms.business.attendance.model.AllAttendanceExcelVO;
 import com.atos.lms.business.attendance.model.AllAttendanceVO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -32,11 +33,8 @@ public interface AllAttendanceDAO {
 
     void updateAllAbsence(List<Integer> attendCodes);
 
-/*
-
     // 엑셀 다운로드용 출석 목록 조회
-    List<AllAttendanceVO> selectAttendanceListForExcel(HttpServletResponse response, AllAttendanceVO attendanceVO);
+    List<AllAttendanceExcelVO> selectAttendanceExcelList(AllAttendanceVO attendanceVO);
 
-*/
 
 }

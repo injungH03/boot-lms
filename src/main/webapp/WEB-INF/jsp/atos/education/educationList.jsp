@@ -19,8 +19,8 @@
         <span>&nbsp;교육 과정 목록</span>
     </div>
 
-    <form id="searchForm" name="searchForm" action="<c:url value='/admin/education/educationList'/>" method="get">
-        <input type="hidden" name="pageIndex" value="${educationSearchVO.pageIndex}">
+    <form id="searchForm" name="searchForm" action="<c:url value='/admin/education/educationList'/>" method="post">
+       <input type="hidden" name="pageIndex" value="${educationSearchVO.pageIndex}">
 
   
 

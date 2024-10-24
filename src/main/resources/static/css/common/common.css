@@ -321,3 +321,17 @@ label.error {
     max-width: 1200px;
     margin: 0 auto; /* 가운데 정렬 */
 }
+
+.course-title .lecture-title {
+    display: block;
+    /* 강의명을 새로운 줄에 표시 */
+}
+
+
+.instructorCalendar {
+    width: 100%;  
+    max-width: 1400px;  
+    min-height: 600px;  
+    margin: 0 auto;  
+    padding-bottom: 100px;  
+}

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atos.lms.business.schedule.service.InstructorScheduleDAO">
+
+
+<!-- 모든 강사의 스케줄 조회 -->
+    <select id="selectAllSchedules" resultType="com.atos.lms.business.schedule.model.InstructorScheduleVO">
+        SELECT
+            S.SCHEDULE_CODE,
+            S.INSTRUCTOR,
+            S.MAIN_EVENT,
+            S.START_DATE,
+            S.END_DATE,
+            S.ALL_DAY,
+            S.SCHEDULE_COLOR,
+            M.NAME AS name,
+            M.ROLE_ID AS roleId
+        FROM
+            ATOS_INSTRUCTOR_SCHEDULE S
+        JOIN
+            ATOS_MEMBER M ON S.INSTRUCTOR = M.ID
+        WHERE
+            M.ROLE_ID = 'R1' <!-- 강사만 필터링 -->
+    </select>
+
+<!-- 강사별 스케줄 조회 -->
+    <select id="selectScheduleByInstructor" resultType="com.atos.lms.business.schedule.model.InstructorScheduleVO">
+        SELECT
+            S.SCHEDULE_CODE,
+            S.INSTRUCTOR,
+            S.MAIN_EVENT,
+            S.START_DATE,
+            S.END_DATE,
+            S.ALL_DAY,
+            S.SCHEDULE_COLOR,
+            M.NAME AS name,
+            M.ROLE_ID AS roleId
+        FROM
+            ATOS_INSTRUCTOR_SCHEDULE S
+        JOIN
+            ATOS_MEMBER M ON S.INSTRUCTOR = M.ID
+        WHERE
+            S.INSTRUCTOR = #{instructor}
+            AND M.ROLE_ID = 'R1' <!-- 강사만 필터링 -->
+    </select>
+
+
+<!-- 스케줄 총 개수 조회 -->
+	 <select id="selectScheduleCountByInstructor" resultType="int">
+	  SELECT COUNT(SCHEDULE_CODE)
+	  FROM ATOS_INSTRUCTOR_SCHEDULE
+	  WHERE INSTRUCTOR = #{instructor}   <!-- 동적으로 전달된 ID를 사용 -->
+	 </select>
+
+
+
+<!-- 모든 강사 목록 조회 -->
+    <select id="selectAllInstructors" resultType="com.atos.lms.business.schedule.model.InstructorScheduleVO">
+        SELECT ID, NAME
+        FROM ATOS_MEMBER
+        WHERE ROLE_ID = 'R1' <!-- 강사만 조회 -->
+    </select>
+
+
+
+<!-- 새로운 스케줄 등록 -->
+    <insert id="insertSchedule" parameterType="com.atos.lms.business.schedule.model.InstructorScheduleVO">
+    INSERT INTO ATOS_INSTRUCTOR_SCHEDULE
+    (INSTRUCTOR, MAIN_EVENT, START_DATE, END_DATE, SCHEDULE_COLOR)
+    VALUES
+    (#{instructor}, #{mainEvent}, #{startDate}, #{endDate}, #{scheduleColor})
+    </insert>
+
+
+<!-- 스케줄 수정 -->
+	<update id="updateSchedule" parameterType="com.atos.lms.business.schedule.model.InstructorScheduleVO">
+    UPDATE ATOS_INSTRUCTOR_SCHEDULE
+    SET
+        MAIN_EVENT = #{mainEvent},
+        START_DATE = #{startDate},
+        END_DATE = #{endDate},
+        SCHEDULE_COLOR = #{scheduleColor},
+        INSTRUCTOR = #{instructor}
+    WHERE
+        SCHEDULE_CODE = #{scheduleCode}
+	</update>
+
+
+<!-- 스케줄 삭제 -->
+	<delete id="deleteSchedule" parameterType="com.atos.lms.business.schedule.model.InstructorScheduleVO">
+	    DELETE FROM ATOS_INSTRUCTOR_SCHEDULE
+	    WHERE SCHEDULE_CODE = #{scheduleCode}
+	</delete>
+
+
+
+
+
+
+
+</mapper>

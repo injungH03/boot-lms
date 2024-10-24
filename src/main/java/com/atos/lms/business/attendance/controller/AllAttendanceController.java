@@ -3,8 +3,10 @@ package com.atos.lms.business.attendance.controller;
 
 import com.atos.lms.business.attendance.model.AllAttendanceVO;
 import com.atos.lms.business.attendance.service.AllAttendanceService;
+import com.atos.lms.common.model.ResponseVO;
 import com.atos.lms.common.utl.PaginationInfo;
 import com.atos.lms.common.utl.ResponseHelper;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +83,7 @@ public class AllAttendanceController {
     // 입실 처리
     @RequestMapping("/checkIn")
     @ResponseBody
-    public ResponseEntity<?> checkIn(@RequestParam("attendCode") int attendCode) {
+    public ResponseEntity<ResponseVO<Void>> checkIn(@RequestParam("attendCode") int attendCode) {
         LOGGER.info("입실 처리 시작 attendCode: " + attendCode);
         try {
             LocalTime inTime = LocalTime.now();
@@ -105,8 +107,9 @@ public class AllAttendanceController {
     // 퇴실 처리
     @RequestMapping("/checkOut")
     @ResponseBody
-    public ResponseEntity<?> checkOut(@RequestBody Map<String, Object> requestData) {
+    public ResponseEntity<ResponseVO<Void>> checkOut(@RequestBody Map<String, Object> requestData) {
         try {
+            @SuppressWarnings("unchecked")
             List<Integer> attendCodes = (List<Integer>) requestData.get("attendCodes");
             LocalTime outTime = LocalTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
@@ -114,26 +117,31 @@ public class AllAttendanceController {
             for (Integer attendCode : attendCodes) {
                 AllAttendanceVO attendanceVO = allAttendanceService.selectAttendanceByCode(attendCode);
                 if (attendanceVO.getInTime() == null) {
-                    return ResponseEntity.status(400).body(ResponseHelper.error("400", "입실 처리가 되지 않았습니다", HttpStatus.BAD_REQUEST, null));
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(ResponseHelper.error("400", "입실 처리가 되지 않았습니다", HttpStatus.BAD_REQUEST, null));
                 }
             }
 
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put("attendCodes", attendCodes);
-            paramMap.put("outTime", outTime.format(formatter));
+            paramMap.put("outTime", outTime.format(DateTimeFormatter.ofPattern("HH:mm")));
             allAttendanceService.updateCheckOutAll(paramMap);
 
-            return ResponseEntity.ok("success");  // 수정된 부분
+            return ResponseEntity.ok(ResponseHelper.success("퇴실 처리 완료"));
         } catch (Exception e) {
             LOGGER.error("퇴실 처리 실패", e);
-            return ResponseEntity.status(500).body(ResponseHelper.error("500", "퇴실 처리 실패", HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ResponseHelper.error("500", "퇴실 처리 실패", HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage()));
         }
     }
+
+
+
 
     // 전체 입실 처리
     @RequestMapping("/checkInAll")
     @ResponseBody
-    public ResponseEntity<?> checkInAll(@RequestBody Map<String, Object> requestData) {
+    public ResponseEntity<ResponseVO<Void>> checkInAll(@RequestBody Map<String, Object> requestData) {
         try {
             allAttendanceService.updateCheckInAll(requestData);
             return ResponseEntity.ok(ResponseHelper.successWithResult("전체 입실 처리 완료", null));
@@ -147,7 +155,7 @@ public class AllAttendanceController {
 // 전체 퇴실 처리
 @RequestMapping("/checkOutAll")
 @ResponseBody
-public ResponseEntity<?> checkOutAll(@RequestBody Map<String, Object> requestData) {
+public ResponseEntity<ResponseVO<Void>> checkOutAll(@RequestBody Map<String, Object> requestData) {
     try {
         // attendCodes가 String 타입으로 전달될 수 있으므로 Integer로 변환
         List<String> attendCodesStr = (List<String>) requestData.get("attendCodes");
@@ -188,7 +196,7 @@ public ResponseEntity<?> checkOutAll(@RequestBody Map<String, Object> requestDat
     // 결석 처리
     @RequestMapping("/allAbsence")
     @ResponseBody
-    public ResponseEntity<?> markAbsent(@RequestBody Map<String, Object> requestData) {
+    public ResponseEntity<ResponseVO<Void>> markAbsent(@RequestBody Map<String, Object> requestData) {
         try {
             List<Integer> attendCodes = (List<Integer>) requestData.get("attendCodes");
             allAttendanceService.updateAllAbsence(attendCodes);
@@ -199,14 +207,13 @@ public ResponseEntity<?> checkOutAll(@RequestBody Map<String, Object> requestDat
         }
     }
 
-/*
-
-    // 출석 목록 엑셀 다운로드
-    @RequestMapping("/attendanceExcelDownload")
-    public void attendanceExcelDownload(HttpServletResponse response, @ModelAttribute("attendanceSearchVO") AllAttendanceVO attendanceVO) throws Exception {
+    // 엑셀 다운로드
+    @RequestMapping("/attendanceListExcelDown")
+    public void attendanceListExcelDown(HttpServletResponse response, AllAttendanceVO attendanceVO) throws Exception {
+        LOGGER.info("엑셀 다운로드 요청 시작");
         allAttendanceService.attendanceListExcelDown(response, attendanceVO);
     }
 
-*/
+
 
 }

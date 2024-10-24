@@ -19,7 +19,7 @@
         <span>&nbsp;통합 수강생 출석관리</span>
     </div>
 
-<form id="searchForm" name="searchForm" action="<c:url value='/admin/education/attendanceList'/>" method="post">
+<form id="searchForm" name="searchForm" action="<c:url value='/admin/education/attendanceList'/>" method="get">
  <input type="hidden" name="pageIndex" value="${attendanceSearchVO.pageIndex}">
 
     <div class="table-section">
@@ -27,7 +27,7 @@
 <!-- 과정 선택 -->
         <table class="search-table">
             <tr>
-                <th class="custom-th-width">과정명</th>
+                <th class="custom-th-width">과정</th>
                 <td>
                     <div class="d-flex">
 						<select name="lectureCode" class="form-select search-selectle me-2">
@@ -82,7 +82,7 @@
             <button class="btn-create-course" id="attendAllCheckIn">입실처리</button>
             <button class="btn-create-course" id="attendAllCheckOut">퇴실처리</button>
             <button class="btn-create-course" id="attendAllAbsence">결석처리</button>
-            <button class="btn-excel" id="excelDownloadBtn">EXCEL</button>
+            <button type="button" class="btn-excel" id="excelDownloadBtn">EXCEL</button>
         </div>
     </div>
 
@@ -93,6 +93,7 @@
                 <col style="width: 3%;">
                 <col style="width: 15%;">
                 <col style="width: 15%;">
+                <col style="width: 5%;">
                 <col style="width: 20%;">
                 <col style="width: 7%;">
                 <col style="width: 9%;">
@@ -106,8 +107,9 @@
                     <th>No</th>
                     <th>소속</th>
                     <th>과정명</th>
-                    <th>수강생</th>
                     <th>상태</th>
+                    <th>수강생</th>
+                    <th>출석여부</th>
                     <th>출석일</th>
                     <th>입실시간</th>
                     <th>퇴실시간</th>
@@ -120,9 +122,13 @@
                     <tr>
                         <td>${(attendanceSearchVO.pageIndex - 1) * attendanceSearchVO.recordCountPerPage + status.index + 1}</td>
                         <td>${resultInfo.corpName}</td> <!-- 소속 -->
-                        <td>${resultInfo.title}</td> <!-- 과정명 추가 -->
+                        <td class="course-title">  <!-- 과정명(교육명[강의명]) -->
+                            <span>${resultInfo.title}</span><br>
+                            <span class="lecture-title">[${resultInfo.lectureTitle}]</span>
+                        </td>
+                        <td>${resultInfo.learnStatus}</td> <!-- 과정 상태 -->
                         <td>${resultInfo.memberId}(${resultInfo.name})</td> <!-- 수강생 아이디(이름) -->
-                        <td>${resultInfo.statusName}</td> <!-- 상태 -->
+                        <td>${resultInfo.statusName}</td> <!-- 상태(출석여부) -->
                         <td>${resultInfo.attendDate}</td> <!-- 출석일 -->
                         <td>${resultInfo.inTime}</td> <!-- 입실 시간 -->
                         <td>${resultInfo.outTime}</td> <!-- 퇴실 시간 -->
@@ -133,7 +139,6 @@
                                 <c:if test="${resultInfo.inTime != null || resultInfo.statusName == '결석'}">style="pointer-events: none; opacity: 0.5;"</c:if>>
                                 입실
                             </button>
-                            
                             <!-- 퇴실 버튼: 퇴실 시간이 이미 있을 경우 비활성화 -->
                             <button class="btn-state absent"
                                 data-attend-code="${resultInfo.attendCode}" 
@@ -145,6 +150,7 @@
                         <td><input type="checkbox" name="rowCheck" value="${resultInfo.attendCode}"></td>
                     </tr>
                 </c:forEach>
+
                 <c:if test="${fn:length(resultList) == 0}">
                     <tr>
                         <td colspan="9">조회된 결과가 없습니다.</td>
@@ -198,19 +204,33 @@
 
 
 
-
-
-
-
-
-
-
-
-
 <script>
 
 $(document).ready(function() {
+
+
+    // $('.course-title').each(function() {
+    //         var text = $(this).text();
+    //         if (text.length > 17) {
+    //             //  (text.length > ) 글자 이후에 줄바꿈 삽입
+    //             var part1 = text.substring(0, 17);
+    //             var part2 = text.substring(17);
+    //             $(this).html(part1 + '<br>' + part2);
+    //         }
+    // });
+
+    $('#excelDownloadBtn').on('click', function() {
+        const searchForm = $('#searchForm');  // 검색 폼 선택
+        const originalAction = searchForm.attr('action');  // 기존 폼 액션 URL 저장
+
+        searchForm.attr('action', '/admin/education/attendanceExcelDownload');  // 엑셀 다운로드 경로로 설정
+        searchForm.submit();  // 폼 제출
+
+        searchForm.attr('action', originalAction);  // 원래 액션으로 복원
+    });
 	
+
+
  // 입실 버튼 클릭 시
     $('.btn-state.attend').on('click', function(event) {
         var attendCode = $(this).data('attend-code');
@@ -234,40 +254,40 @@ $(document).ready(function() {
         });
     });
 
-// 퇴실 버튼 클릭 시
-$('.btn-state.absent').click(function() {
-    var attendCode = $(this).data('attend-code');
 
-    $.ajax({
-        url: "<c:url value='/admin/education/checkOut' />",
-        type: "POST",
-        contentType: "application/json",  // JSON 형식으로 전송
-        data: JSON.stringify({ attendCodes: [attendCode] }),  // 배열로 전달
-        success: function(response) {
-            // response === "success" 확인 후 처리
-            if (response === "success") {
-                alert("퇴실 처리가 완료되었습니다.");
-                location.reload(); // 페이지 새로고침
-            } else {
-                alert(response.message || "퇴실 처리에 실패하였습니다.");
-            }
-        },
-        error: function(xhr) {
-            if (xhr.status === 400) {
-                // JSON 데이터를 파싱하여 사용자에게 메시지로 표시
-                try {
-                    var errorResponse = JSON.parse(xhr.responseText);
-                    alert(errorResponse.message || "입실 처리가 되지 않았습니다.");
-                } catch (e) {
-                    alert("입실 처리가 되지 않았습니다.");  // 기본 메시지 출력
+
+// 퇴실 버튼 클릭 시
+    $('.btn-state.absent').click(function() {
+        var attendCode = $(this).data('attend-code');
+
+        $.ajax({
+            url: "<c:url value='/admin/education/checkOut' />",
+            type: "POST",
+            contentType: "application/json",  // JSON 형식으로 전송
+            data: JSON.stringify({ attendCodes: [attendCode] }),  // 배열로 전달
+            success: function(response) {
+                // response.status 확인 후 처리
+                if (response.status) {  // 서버에서 status가 true일 때 성공으로 처리
+                    alert("퇴실 처리가 완료되었습니다.");
+                    location.reload(); // 페이지 새로고침
+                } else {
+                    alert(response.message || "퇴실 처리에 실패하였습니다.");
                 }
-            } else {
-                alert("퇴실 처리 중 오류가 발생하였습니다.");
+            },
+            error: function(xhr) {
+                if (xhr.status === 400) {
+                    try {
+                        var errorResponse = JSON.parse(xhr.responseText);
+                        alert(errorResponse.message || "입실 처리가 되지 않았습니다.");
+                    } catch (e) {
+                        alert("입실 처리가 되지 않았습니다.");  // 기본 메시지 출력
+                    }
+                } else {
+                    alert("퇴실 처리 중 오류가 발생하였습니다.");
+                }
             }
-        }
+        });
     });
-});
-	 
 
 
 	
@@ -421,10 +441,6 @@ $('#attendAllCheckOut').on('click', function(event) {
 });
 
 
-
-
-
-
     
  // 결석 처리 버튼 클릭 시
 $('#attendAllAbsence').click(function() {
@@ -481,19 +497,6 @@ $('#attendAllAbsence').click(function() {
 });
  
  
- 
-    // 엑셀 다운로드 버튼 클릭 시
-    $('#excelDown').on('click', function(){
-        const attendanceForm = $('#allAttendancenForm');  // 현재 form 선택
-        const originalAction = attendanceForm.attr('action');
-
-        // 엑셀 다운로드 경로로 form action 설정
-        attendanceForm.attr('action', '<c:url value="/admin/education/attendanceExcelDownload"/>');
-        
-        attendanceForm.submit();  // form 제출로 검색 조건과 함께 전송
-        
-        attendanceForm.attr('action', originalAction);  // action 원래 경로로 복구
-    });
 
 }); 
 

@@ -1,8 +1,11 @@
 package com.atos.lms.business.attendance.service;
 
 
+import com.atos.lms.business.attendance.model.AllAttendanceExcelVO;
 import com.atos.lms.business.attendance.model.AllAttendanceVO;
+import com.atos.lms.common.utl.ExcelUtil;
 import com.atos.lms.common.utl.SortFieldValidator;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,32 +78,25 @@ public class AllAttendanceService {
         allAttendanceDAO.updateAllAbsence(attendCodes);
     }
 
-/*
-
     // 엑셀 다운로드
-    @Transactional
     public void attendanceListExcelDown(HttpServletResponse response, AllAttendanceVO attendanceVO) throws Exception {
-        // DAO를 통해 엑셀 다운로드에 필요한 출석 목록 데이터를 가져옵니다.
-        List<AllAttendanceVO> attendanceList = allAttendanceDAO.selectAttendanceListForExcel(attendanceVO);
+        List<AllAttendanceExcelVO> list = allAttendanceDAO.selectAttendanceExcelList(attendanceVO);
 
-        // 필드 이름을 엑셀 헤더로 매핑하는 맵을 설정합니다.
-        Map<String, String> fieldToHeaderMap = Map.of(
-                "corpName", "법인명",
-                "title", "교육 제목",
-                "enrollID", "학생 아이디",
-                "name", "학생 이름",
-                "status", "상태",
-                "attendDate", "출석 날짜",
-                "inTime", "입실 시간",
-                "outTime", "퇴실 시간"
-        );
+        Map<String, String> fieldToHeaderMap = new HashMap<>();
+        fieldToHeaderMap.put("No", "No");  // 번호 컬럼 추가
+        fieldToHeaderMap.put("corpName", "소속");
+        fieldToHeaderMap.put("title", "과정명");
+        fieldToHeaderMap.put("lectureTitle", "강의 제목");
+        fieldToHeaderMap.put("memberId", "수강생 ID");
+        fieldToHeaderMap.put("name", "수강생 이름");
+        fieldToHeaderMap.put("status", "출석 상태");
+        fieldToHeaderMap.put("attendDate", "출석일");
+        fieldToHeaderMap.put("inTime", "입실시간");
+        fieldToHeaderMap.put("outTime", "퇴실시간");
+        fieldToHeaderMap.put("learnStatus", "강의 상태");
 
-        // ExcelUtil을 사용하여 엑셀 파일을 생성하고 다운로드합니다.
-        ExcelUtil.exportToExcel(response, attendanceList, "출석 목록", "attendance_list", fieldToHeaderMap);
+        ExcelUtil.exportToExcel(response, list, "출석부", "출석 목록", fieldToHeaderMap);
     }
-
-
-*/
 
 
 }

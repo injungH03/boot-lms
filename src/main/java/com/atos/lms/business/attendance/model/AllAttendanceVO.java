@@ -24,6 +24,8 @@ public class AllAttendanceVO extends AllAttendanceMasterVO {
 	/* atos_member */
 	private String memberId;       // 학생아이디
 	private String name;          // 이름
+
+	/* atos_enrollment */
 	private int lectureId; 		//강의 정보 코드
 
 	/* atos_company */
@@ -34,8 +36,8 @@ public class AllAttendanceVO extends AllAttendanceMasterVO {
     private int eduCode;          // 교육 코드
     private String title;         // 교육 명칭
 
-
-    private int lectureCode;  // 강의 코드
-
+	/* atos_lecture */
+    private int lectureCode;  		// 강의 코드
+	private String lectureTitle;	 // 강의 제목
 
 }
